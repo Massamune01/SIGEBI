@@ -19,6 +19,8 @@ namespace SIGEBI.Domain.Entities
         public DateTime? Birthday { get; set; }
         public Status UserEstatus { get; set; } = Status.Activo;
         public int RolId { get; set; }
+        public Roles Rol { get; set; } = null!;
+
         
     }
 }
