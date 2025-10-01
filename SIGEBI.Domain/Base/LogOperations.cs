@@ -1,13 +1,17 @@
 ﻿using System.Reflection.Metadata;
+using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Domain.Base
 {
-    public class LogOperations : BaseDomainEntity
+    public class LogOperations
     {
-        public int ID { get; set; }
-        public string EntityName { get; set; }
-        public int EntityId { get; set; }
-        public string TypeOperation { get; set; }
-        public string Descripcion { get; set; }
+        public int IdOp { get; set; }
+        public string Entity { get; set; } = string.Empty;
+        public DateTime Fecha { get; set; }
+        public string TypeOperation { get; set; } = string.Empty;
+        public string? Descripcion { get; set; }
+        public DateTime? LastUpdateBy { get; set; }
+        public DateTime? UpdateBy { get; set; }
+        public string StatusOp { get; set; } = string.Empty;
     }
 }

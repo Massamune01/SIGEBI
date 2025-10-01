@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Enums;
 
-namespace SIGEBI.Domain.Entities
+namespace SIGEBI.Domain.Entities.Configuration
 {
     public sealed class Admin : Usuario 
     {
         public Status AdminEstatus { get; set; } = Status.Activo;
+        public int? IdLgOpAdmin { get; set; }
     }
 }

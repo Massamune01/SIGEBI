@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using SIGEBI.Domain.Base;
+using SIGEBI.Domain.Entities.Configuration;
 
 namespace SIGEBI.Domain.Repository
 {
