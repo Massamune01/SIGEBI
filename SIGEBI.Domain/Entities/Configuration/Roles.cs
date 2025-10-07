@@ -10,7 +10,7 @@ namespace SIGEBI.Domain.Entities.Configuration
     public sealed class Roles
     {
         public int Id { get; set; }
-        public string Rol { get; set; }
+        public string? Rol { get; set; }
 
         public Status RolEstatus { get; set; } = Status.Activo;
         public int? IdLgOpRol { get; set; }
