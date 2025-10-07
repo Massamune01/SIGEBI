@@ -16,9 +16,34 @@ namespace SIGEBI.Infraestructure.Data.Configuration
             _connectionString = connectionString;
         }
 
+
         public async Task<List<T>> ExecuteReaderAsync<T>(
         string storedProcedure,
         Func<SqlDataReader, T> map)
+        {
+            var resultList = new List<T>();
+
+            using var conn = new SqlConnection(_connectionString);
+            using var cmd = new SqlCommand(storedProcedure, conn)
+            {
+                CommandType = System.Data.CommandType.StoredProcedure
+            };
+
+            await conn.OpenAsync();
+
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                resultList.Add(map(reader));
+            }
+
+            return resultList;
+        }
+
+        public async Task<List<T>> ExecuteReaderAsync<T>(
+        string storedProcedure,
+        Func<SqlDataReader, T> map,
+        IEnumerable<SqlParameter>? parameters = null)
         {
             var result = new List<T>();
 
@@ -27,6 +52,9 @@ namespace SIGEBI.Infraestructure.Data.Configuration
             {
                 CommandType = System.Data.CommandType.StoredProcedure
             };
+
+            if (parameters != null)
+                cmd.Parameters.AddRange(parameters.ToArray());
 
             await conn.OpenAsync();
 
@@ -43,8 +71,8 @@ namespace SIGEBI.Infraestructure.Data.Configuration
             string storedProcedure,
             IEnumerable<SqlParameter> parameters)
         {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(storedProcedure, conn)
+            await using var conn = new SqlConnection(_connectionString);
+            await using var cmd = new SqlCommand(storedProcedure, conn)
             {
                 CommandType = System.Data.CommandType.StoredProcedure
             };

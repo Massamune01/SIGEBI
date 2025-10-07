@@ -16,10 +16,6 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarRol
                 .Must(s => !string.IsNullOrWhiteSpace(s)).WithMessage("El nombre del rol no puede ser sólo espacios.")
                 .MaximumLength(30).WithMessage("El nombre del rol no puede exceder 30 caracteres.");
 
-            // Opcional: evitar caracteres raros (letras, dígitos, espacios, guiones y subrayado)
-            RuleFor(r => r.Rol)
-                .Matches(@"^[\p{L}\p{N}\s\-\_]+$").WithMessage("El nombre del rol contiene caracteres no permitidos.");
-
             // StatusRol: obligatorio y dentro del conjunto permitido
             RuleFor(r => r.RolEstatus)
                 .NotEmpty().WithMessage("El estado del rol es obligatorio.");

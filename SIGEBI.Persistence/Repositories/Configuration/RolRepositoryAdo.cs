@@ -28,8 +28,6 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         {
             _logger = logger;
             _dbHelper = HelperDb;
-
-
         }
 
         public Task<bool> Exists(Expression<Func<Roles, bool>> filter)
@@ -49,7 +47,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                     {
                         Id = reader.GetInt32(reader.GetOrdinal("Id")),
                         Rol = reader.GetString(reader.GetOrdinal("Rol")),
-                        RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("RolEstatus")),
+                        RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("StatusRol")),
                         IdLgOpLibro = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
                             ? null
                             : reader.GetInt32(reader.GetOrdinal("IdLgOpRol"))
@@ -84,9 +82,47 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             throw new NotImplementedException();
         }
 
-        public Task<OperationResult> GetEntityBy(int Id)
+        public async Task<OperationResult> GetEntityBy(int Id)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Id", SqlDbType.Int) { Value = Id }
+                };
+
+                var rol = await _dbHelper.ExecuteReaderAsync(
+                    "SP_GET_ROL_BY_ID",
+                    reader => new RolGetModel
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                        Rol = reader.GetString(reader.GetOrdinal("Rol")),
+                        RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("StatusRol")),
+                        IdLgOpLibro = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
+                            ? null
+                            : reader.GetInt32(reader.GetOrdinal("IdLgOpRol"))
+                    },parameters
+                );
+                if (rol == null)
+                {
+                    result.Success = false;
+                    result.Message = "No se encontró el rol con el Id proporcionado.";
+                }
+                else
+                {
+                    result.Success = true;
+                    result.Message = "Rol obtenido correctamente.";
+                    result.Data = rol;
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = "Error al obtener rol por Id";
+                _logger.LogError(ex, result.Message);
+            }
+            return result;
         }
 
         public Roles? GetRolById(int id)
@@ -105,15 +141,15 @@ namespace SIGEBI.Persistence.Repositories.Configuration
 
             try
             {
-                // Creamos el parámetro para el Id del rol
-                    var parameters = new List<SqlParameter>
-                    {
-                        new SqlParameter("@Id", SqlDbType.Int) { Value = entity.Id }
-                    };
+                    
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Id", SqlDbType.Int) { Value = entity.Id }
+                };
 
-                // Ejecutamos el non-query usando stored procedure o query directo
+                
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "DELETE FROM Roles WHERE Id = @Id",
+                    "SP_SOFT_DELETE_ROL_BY_ID",
                     parameters
                 );
 
@@ -156,7 +192,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 };
 
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "INSERT INTO Roles (Rol, RolEstatus) VALUES (@Rol, @RolEstatus)",
+                    "SP_INSERT_ROL",
                     parameters
                 );
 
@@ -200,7 +236,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 };
 
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "UPDATE Roles SET Rol = @Rol, RolEstatus = @RolEstatus WHERE Id = @Id",
+                    "SP_UPDATE_ROL",
                     parameters
                 );
 
@@ -215,7 +251,6 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 result.Success = false;
                 result.Message = "Error al actualizar rol";
             }
-
             return result;
         }
     }

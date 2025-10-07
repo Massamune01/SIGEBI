@@ -6,6 +6,6 @@ namespace SIGEBI.Application.Dtos.Configuration.RolDtos
     {
         [Required, StringLength(60)]
         public string Nombre { get; set; } = null!;
-        public int? IdLgOpLibro { get; set; }
+        public int? IdLgOpRol { get; set; }
     }
 }

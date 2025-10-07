@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Repository;
@@ -10,7 +11,7 @@ using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
 namespace SIGEBI.Persistence.Repositories.Configuration
 {
-    public class CredencialesRepositoryAdo : IBaseRepository<Credenciales>
+    public class CredencialesRepositoryAdo : ICredencialesRepository
     {
         private readonly ILogger<CredencialesRepositoryAdo> _logger;
         private readonly HelperDb _dbHelper;
@@ -62,9 +63,95 @@ namespace SIGEBI.Persistence.Repositories.Configuration
 
         }
 
-        public async Task<OperationResult> GetEntityBy(int Id)
+        public Task<OperationResult> GetCredencialesByClienteId(int clienteId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<OperationResult> GetCredencialesById(int Id)
+        {
+            OperationResult operationResult = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Id", SqlDbType.Int) { Value = Id }
+                };
+
+                var credential = await _dbHelper.ExecuteReaderAsync(
+                    "SP_GET_CRE_BY_ID",
+                    reader => new CredencialesGetModel
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                        ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                        Usuario = reader.GetString(reader.GetOrdinal("Usuario")),
+                        PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
+                    },
+                    parameters
+                );
+                if (credential != null)
+                {
+                    operationResult.Success = true;
+                    operationResult.Data = credential;
+                    operationResult.Message = "Credencial obtenida correctamente.";
+                    return operationResult;
+                }
+                else
+                {
+                    operationResult.Success = false;
+                    operationResult.Message = "No se encontró la credencial.";
+                }
+            }
+            catch (Exception ex)
+            {
+                operationResult.Success = false;
+                operationResult.Message = "Error al obtener credencial por Id";
+                _logger.LogError(ex, operationResult.Message);
+            }
+            return operationResult;
+        }
+
+        public async Task<OperationResult> GetEntityBy(int Id)
+        {
+            OperationResult operationResult = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Id", SqlDbType.Int) { Value = Id }
+                };
+
+                var credential = await _dbHelper.ExecuteReaderAsync(
+                    "SP_GET_CRE_BY_ID",
+                    reader => new CredencialesGetModel
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                        ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                        Usuario = reader.GetString(reader.GetOrdinal("Usuario")),
+                        PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
+                    },
+                    parameters
+                );
+                if (credential != null)
+                {
+                    operationResult.Success = true;
+                    operationResult.Data = credential;
+                    operationResult.Message = "Credencial obtenida correctamente.";
+                    return operationResult;
+                }
+                else
+                {
+                    operationResult.Success = false;
+                    operationResult.Message = "No se encontró la credencial.";
+                }
+            }
+            catch (Exception ex)
+            {
+                operationResult.Success = false;
+                operationResult.Message = "Error al obtener credencial por Id";
+                _logger.LogError(ex, operationResult.Message);
+            }
+            return operationResult;
         }
 
         public async Task<OperationResult> Remove(Credenciales entity)
@@ -78,7 +165,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             };
 
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "DELETE FROM Credenciales WHERE Id = @Id",
+                    "SP_REMOVE_CREDENCIAL",
                     parameters
                 );
 
@@ -101,14 +188,15 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             try
             {
                 var parameters = new List<SqlParameter>
-            {
-                new SqlParameter("@Username", SqlDbType.NVarChar, 100) { Value = entity.Usuario },
-                new SqlParameter("@PasswordHash", SqlDbType.NVarChar, 200) { Value = entity.PasswordHash },
-                new SqlParameter("@RolId", SqlDbType.Int) { Value = entity.Id }
-            };
+                {
+                new SqlParameter("@ClienteId", SqlDbType.Int) { Value = entity.ClienteId },
+                new SqlParameter("@Usuario", SqlDbType.NVarChar, 80) { Value = entity.Usuario },
+                new SqlParameter("@PasswordHash", SqlDbType.NVarChar, 200) { Value = entity.PasswordHash }
+
+                };
 
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "INSERT INTO Credenciales (Username, PasswordHash, RolId) VALUES (@Username, @PasswordHash, @RolId)",
+                    "SP_INSERT_CREDENCIAL",
                     parameters
                 );
 
@@ -135,19 +223,20 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 var parameters = new List<SqlParameter>
                 {
                     new SqlParameter("@Id", SqlDbType.Int) { Value = entity.Id },
-                    new SqlParameter("@ClienteId", SqlDbType.Int) { Value = entity.ClienteId },
-                    new SqlParameter("@Usuario", SqlDbType.NVarChar, 80) { Value = entity.Usuario },
-                    new SqlParameter("@PasswordHash", SqlDbType.NVarChar, 200) { Value = entity.PasswordHash }
+                    new SqlParameter("@Usuario", SqlDbType.NVarChar, 80) { Value = entity.Usuario }
                 };
                 var rows = await _dbHelper.ExecuteNonQueryAsync(
-                    "UPDATE Credenciales SET ClienteId = @ClienteId, Usuario = @Usuario, PasswordHash = @PasswordHash WHERE Id = @Id",
+                    "SP_UPDATE_CREDENCIAL_USER",
                     parameters
                 );
 
-                result.Success = rows > 0;
-                result.Message = rows > 0
-                    ? "Credencial actualizada correctamente."
-                    : "No se pudo actualizar la credencial.";
+                if (rows > 0)
+                {
+                    result.Success = true;
+                    result.Message = "Credencial actualizada correctamente.";
+                }
+
+                
             }
             catch (Exception ex)
             {
