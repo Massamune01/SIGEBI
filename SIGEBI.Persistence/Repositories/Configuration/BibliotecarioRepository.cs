@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
@@ -28,14 +24,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             _logger = logger;
         }
 
-        public List<Bibliotecarios> GetAdminByStatus(Status status)
+        public async Task<List<Bibliotecarios>> GetBiblioByStatus(Status status)
         {
             try
             {
                 _logger.LogInformation("Searching Bibliotecarios with status {Status}.", status);
-                return _context.Bibliotecarios
+                return await _context.Bibliotecarios
                                .Where(b => b.BiblioEstatus == status)
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -44,14 +40,46 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             }
         }
 
-        public List<Bibliotecarios> GetBiblioById(int id)
+        public async Task<List<Bibliotecarios>> GetBiblioByEmail(string email)
+        {
+            try
+            {
+                _logger.LogInformation("Searching Bibliotecarios for email that contains {email}", email);
+                return await _context.Bibliotecarios
+                    .Where(b => b.Email == email)
+                    .ToListAsync();
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error searching Bibliotecarios for email");
+                return new List<Bibliotecarios>();
+            }
+        }
+
+        public async Task<List<Bibliotecarios>> GetBiblioByCedula(string cedula)
+        {
+            try
+            {
+                _logger.LogInformation("Searching Bibliotecarios for cedula that contains {Cedula}", cedula);
+                return await _context.Bibliotecarios
+                    .Where(b => b.Cedula.Contains(cedula))
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching Bibliotecarios for cedula");
+                return new List<Bibliotecarios>();
+            }
+        }
+
+        public async Task<List<Bibliotecarios>> GetBiblioById(int id)
         {
             try
             {
                 _logger.LogInformation("Searching bibliotecario with Id {Id}", id);
-                return _context.Bibliotecarios
+                return await _context.Bibliotecarios
                                .Where(b => b.Id == id)
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -60,14 +88,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             }
         }
 
-        public List<Bibliotecarios> GetBiblioByName(string name)
+        public async Task<List<Bibliotecarios>> GetBiblioByName(string name)
         {
             try
             {
                 _logger.LogInformation("Searching Bibliotecarios for nombre that contains {Name}", name);
-                return _context.Bibliotecarios
+                return await _context.Bibliotecarios
                                .Where(b => b.Nombre.Contains(name) || b.Apellido.Contains(name))
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -76,14 +104,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             }
         }
 
-        public List<Bibliotecarios> GetBiblioByRol(int rol)
+        public async Task<List<Bibliotecarios>> GetBiblioByRol(int rol)
         {
             try
             {
                 _logger.LogInformation("Buscando bibliotecarios con rol {Rol}", rol);
-                return _context.Bibliotecarios
+                return await _context.Bibliotecarios
                                .Where(b => b.RolId == rol)
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {

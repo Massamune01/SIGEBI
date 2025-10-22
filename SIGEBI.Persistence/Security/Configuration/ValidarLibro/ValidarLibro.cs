@@ -32,7 +32,7 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarLibro
                 .NotEmpty().WithMessage("El campo editorial no puede estar vacío.")
                 .MaximumLength(100).WithMessage("El campo editorial no puede exceder los 100 caracteres.");
             //Año de publicacion no nulo y positivo
-            RuleFor(l => l.añoPublicacion)
+            RuleFor(l => l.anoPublicacion)
                 .NotEmpty().WithMessage("El campo año de publicación no puede estar vacío.")
                 .GreaterThan(0).WithMessage("El campo año de publicación debe ser un número positivo.");
             //Categoria no nulo y maximo 80 caracteres
@@ -45,11 +45,7 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarLibro
                 .GreaterThan(0).WithMessage("El campo número de páginas debe ser un número positivo.");
             //Cantidad no nulo y positivo
             RuleFor(l => l.cantidad)
-                .NotEmpty().WithMessage("El campo cantidad no puede estar vacío.")
-                .GreaterThan(0).WithMessage("El campo cantidad debe ser un número positivo.");
-            //Disponible no nulo
-            RuleFor(l => l.disponible)
-                .NotNull().WithMessage("El campo disponible no puede estar vacío.");
+                .NotEmpty().WithMessage("El campo cantidad no puede estar vacío.");
             //Status no nulo
             RuleFor(l => l.Status)
                 .NotNull().WithMessage("El campo estado no puede estar vacío.");

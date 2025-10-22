@@ -33,7 +33,7 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarPrestamos
                 .WithMessage("La fecha real de devolución no puede ser anterior a la fecha de préstamo.");
 
             // Status - obligatorio y debe estar entre los permitidos
-            RuleFor(p => p.PrestamosStatus)
+            RuleFor(p => p.Status)
                 .NotEmpty().WithMessage("El estado es obligatorio.")
                 .Must(s => s.Equals("Disponible" ))
                 .WithMessage("El estado debe ser 'Disponible' o 'Inactivo'.");

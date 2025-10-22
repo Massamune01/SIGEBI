@@ -3,6 +3,7 @@ using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
+using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
 
 namespace SIGEBI.Application.Services
@@ -11,11 +12,17 @@ namespace SIGEBI.Application.Services
     {
         private readonly IRolRepository _rolRepository;
         private readonly ILogger<RolService> _logger;
+        private readonly IValidatorBase<RolCreateDto> _rolCreateValidator;
+        private readonly IValidatorBase<RolUpdateDto> _rolUpdateValidator;
 
-        public RolService(IRolRepository rolRepository, ILogger<RolService> logger)
+
+        public RolService(IRolRepository rolRepository, ILogger<RolService> logger, 
+            IValidatorBase<RolUpdateDto> rolUpdateValidator, IValidatorBase<RolCreateDto> createValidator)
         {
             _rolRepository = rolRepository;
             _logger = logger;
+            _rolUpdateValidator = rolUpdateValidator;
+            _rolCreateValidator = createValidator;
         }
 
         public async Task<ServiceResult> CreateRol(RolCreateDto createRolDto)
@@ -24,6 +31,16 @@ namespace SIGEBI.Application.Services
 
             try
             {
+                _logger.LogInformation("Validating role creation data for role: {RolName}", createRolDto.Nombre);
+                var validationResult = await _rolCreateValidator.ValidateCreate(createRolDto);
+                if (validationResult.Errors.Any())
+                {
+                    result.Success = false;
+                    result.Message = "Role creation validation failed.";
+                    result.Data = validationResult.Errors;
+                    return result;
+                }
+
                 _logger.LogInformation("Creating a role with name: {RolName}", createRolDto.Nombre);
 
                 if (createRolDto is null)
@@ -108,6 +125,16 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             try
             {
+                _logger.LogInformation("Validating role update data for role ID: {RolId}", updateRolDto.Id);
+                var validationResult = await _rolUpdateValidator.ValidateUpdate(updateRolDto);
+                if (validationResult.Errors.Any())
+                {
+                    result.Success = false;
+                    result.Message = "Role update validation failed.";
+                    result.Data = validationResult.Errors;
+                    return result;
+                }
+
                 _logger.LogInformation("Updating role with ID: {RolId}", updateRolDto.Id);
                 if (updateRolDto is null)
                 {

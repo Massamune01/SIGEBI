@@ -130,9 +130,36 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             throw new NotImplementedException();
         }
 
-        public List<Roles> GetRolByName(string name)
+        public async Task<List<Roles>> GetRolByName(string name)
         {
-            throw new NotImplementedException();
+            OperationResult result = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Rol", SqlDbType.NVarChar, 100) { Value = name }
+                };
+                var roles =  _dbHelper.ExecuteReaderAsync(
+                    "SP_GET_ROL_BY_NAME",
+                    reader => new Roles
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                        Rol = reader.GetString(reader.GetOrdinal("Rol")),
+                        RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("StatusRol")),
+                        IdLgOpRol = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
+                            ? null
+                            : reader.GetInt32(reader.GetOrdinal("IdLgOpRol"))
+                    },parameters
+                ).Result;
+                return roles;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = "Error al obtener rol por nombre";
+                _logger.LogError(ex, result.Message);
+                return new List<Roles>();
+            }
         }
 
         public async Task<OperationResult> Remove(Roles entity)

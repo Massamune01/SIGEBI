@@ -23,7 +23,7 @@ namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
         [EmailAddress]
         public string? Email { get; set; }
 
-        public DateTime? Nacimiento { get; set; }
+        public DateOnly? Nacimiento { get; set; }
 
         [Required]
         public int RolId { get; set; }

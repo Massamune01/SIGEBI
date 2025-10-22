@@ -13,6 +13,7 @@ namespace SIGEBI.Application.Repositories.Configuration
     {
         Task<List<LogOperations>> GetByEntity(string entity);
         Task<List<LogOperations>> GetByTypeOperation(string typeOperation);
-        Task<List<LogOperations>> GetByStatus(string statusOp);
+        Task<List<LogOperations>> GetByStatus(int statusOp);
+        Task<List<LogOperations>> GetLogOpById(int  logId);
     }
 }

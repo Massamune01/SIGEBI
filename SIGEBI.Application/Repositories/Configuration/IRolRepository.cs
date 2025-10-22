@@ -11,6 +11,6 @@ namespace SIGEBI.Application.Repositories.Configuration
     public interface IRolRepository : IBaseRepository<Roles>
     {
         Roles? GetRolById(int id);
-        List<Roles> GetRolByName(string name);
+        Task<List<Roles>> GetRolByName(string name);
     }
 }

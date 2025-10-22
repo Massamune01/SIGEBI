@@ -11,9 +11,11 @@ namespace SIGEBI.Application.Repositories.Configuration
 {
     public interface IBibliotecariosRepository : IBaseRepository<Bibliotecarios>
     {
-        List<Bibliotecarios> GetBiblioById(int id);
-        List<Bibliotecarios> GetBiblioByName(string name);
-        List<Bibliotecarios> GetBiblioByRol(int rol);
-        List<Bibliotecarios> GetAdminByStatus(Status status);
+        Task<List<Bibliotecarios>> GetBiblioById(int id);
+        Task<List<Bibliotecarios>> GetBiblioByName(string name);
+        Task<List<Bibliotecarios>> GetBiblioByCedula(string cedula);
+        Task<List<Bibliotecarios>> GetBiblioByEmail(string email);
+        Task<List<Bibliotecarios>> GetBiblioByRol(int rol);
+        Task<List<Bibliotecarios>> GetBiblioByStatus(Status status);
     }
 }

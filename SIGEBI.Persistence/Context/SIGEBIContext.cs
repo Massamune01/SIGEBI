@@ -17,11 +17,11 @@ namespace SIGEBI.Persistence.Context
 
         #region "Entidades del módulo de Configuración"
 
-        public DbSet<Libro> Libros { get; set; }
-        public DbSet<Cliente> Clientes { get; set; }
+        public DbSet<Libro> Libro { get; set; }
+        public DbSet<Cliente> Cliente { get; set; }
         public DbSet<Bibliotecarios> Bibliotecarios { get; set; }
         public DbSet<Prestamos> Prestamos { get; set; }
-        public DbSet<Admin> Admins { get; set; }
+        public DbSet<Admin> Admin { get; set; }
         public DbSet<Credenciales> Credenciales { get; set; }
         public DbSet<LogOperations> LogOperations { get; set; }
 

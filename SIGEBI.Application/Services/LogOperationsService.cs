@@ -6,6 +6,7 @@ using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Base;
+using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Application.Services
 {
@@ -17,12 +18,12 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<UpdateLogOperationDto> _updateValidator;
 
         public LogOperationsService(ILogOperationsRepository logOperationsRepository, ILogger<LogOperationsService> logger, 
-            IValidatorBase<CreateLogOperationDto> createvalidator, IValidatorBase<UpdateLogOperationDto> updatevalidator)
+            IValidatorBase<CreateLogOperationDto> createValidator, IValidatorBase<UpdateLogOperationDto> updateValidator)
         {
             _logOperationsRepository = logOperationsRepository;
             _logger = logger;
-            _createValidator = createvalidator;
-            _updateValidator = updatevalidator;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         public async Task<ServiceResult> CreateLogOperationsAsync(CreateLogOperationDto logOpCreateDto)
@@ -31,15 +32,14 @@ namespace SIGEBI.Application.Services
             try 
             {
                 //Business validations
-                var logOpValidation = _createValidator.ValidateCreate(logOpCreateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var createValidator = await _createValidator.ValidateCreate(logOpCreateDto);
+                if (!createValidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", createValidator.Errors);
                     return result;
                 }
-                */
+                
 
                 _logger.LogInformation("Creating a log operation for entity: {Entity}", logOpCreateDto.Entity);
                 if (logOpCreateDto is null)
@@ -55,7 +55,7 @@ namespace SIGEBI.Application.Services
                     Fecha = logOpCreateDto.Fecha,
                     TypeOperation = logOpCreateDto.TypeOperation,
                     Descripcion = logOpCreateDto.Descripcion,
-                    StatusOp = logOpCreateDto.StatusOp
+                    StatusOp = (Status)logOpCreateDto.StatusOp
                 };
                 var createdLogOperation = await _logOperationsRepository.Save(logOperation);
                 if (createdLogOperation is null) 
@@ -96,7 +96,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
 
-                var logOperations = (LogOperations?)oLogOperation.Data;
+                var logOperations = oLogOperation.FirstOrDefault();
 
                 var deleteResult = await _logOperationsRepository.Remove(logOperations);
                 if (!deleteResult.Success)
@@ -156,7 +156,7 @@ namespace SIGEBI.Application.Services
             {
                 _logger.LogInformation("Retrieving log operation with ID: {Id}", id);
                 var oLogOperation = await _logOperationsRepository.GetLogOpById(id);
-                if (oLogOperation is null || oLogOperation.Data is null)
+                if (oLogOperation is null)
                 {
                     result.Success = false;
                     result.Message = "Log operation not found.";
@@ -164,7 +164,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
                 result.Success = true;
-                result.Data = oLogOperation.Data;
+                result.Data = oLogOperation.FirstOrDefault();
                 result.Message = "Log operation retrieved successfully.";
                 _logger.LogInformation(result.Message);
                 return result;
@@ -184,15 +184,15 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var logOpValidation = _updateValidator.ValidateUpdate(logOpUpdateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var updateValidator = await _updateValidator.ValidateUpdate(logOpUpdateDto);
+                
+                if (!updateValidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", updateValidator.Errors);
                     return result;
                 }
-                */
+                
 
                 _logger.LogInformation("Updating log operation with ID: {Id}", logOpUpdateDto.IdOp);
                 if (logOpUpdateDto is null)
@@ -203,7 +203,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
                 var oLogOperation = await _logOperationsRepository.GetLogOpById(logOpUpdateDto.IdOp);
-                if (oLogOperation is null || oLogOperation.Data is null)
+                if (oLogOperation is null)
                 {
                     result.Success = false;
                     result.Message = "Log operation not found.";
@@ -212,7 +212,7 @@ namespace SIGEBI.Application.Services
                 }
                 var logOperation = new LogOperations() 
                 { 
-                    Id = logOpUpdateDto.IdOp,
+                    IdOp = logOpUpdateDto.IdOp,
                     Descripcion = logOpUpdateDto.Descripcion,
                     UpdateBy = logOpUpdateDto.UpdateBy,
                     StatusOp = logOpUpdateDto.StatusOp,

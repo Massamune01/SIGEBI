@@ -16,12 +16,13 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<AdminCreateDto> _createValidator;
         private readonly IValidatorBase<AdminUpdateDto> _updateValidator;
 
-        public AdminServices(IAdminRepository adminRepository, ILogger<AdminServices> logger, IValidatorBase<AdminCreateDto> createvalidator, IValidatorBase<AdminUpdateDto> updatevalidator)
+        public AdminServices(IAdminRepository adminRepository, ILogger<AdminServices> logger, 
+            IValidatorBase<AdminCreateDto> createValidator, IValidatorBase<AdminUpdateDto> updateValidator)
         {
             _logger = logger;
             _adminRepository = adminRepository;
-            _createValidator = createvalidator;
-            _updateValidator = updatevalidator;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
 
         }
 
@@ -50,7 +51,7 @@ namespace SIGEBI.Application.Services
                     Edad = adminCreateDto.Edad,
                     Genero = adminCreateDto.Genero,
                     Email = adminCreateDto.Email,
-                    Nacimiento = adminCreateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = adminCreateDto.Nacimiento,
                     RolId = adminCreateDto.RolId,
                     AdminEstatus = (adminCreateDto.AdminEstatus ?? Status.Activo),
                     IdLgOpAdmin = adminCreateDto.IdLgOpAdmin
@@ -221,7 +222,7 @@ namespace SIGEBI.Application.Services
                     Edad = adminUpdateDto.Edad,
                     Genero = adminUpdateDto.Genero,
                     Email = adminUpdateDto.Email,
-                    Nacimiento = adminUpdateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = adminUpdateDto.Nacimiento,
                     RolId = adminUpdateDto.RolId,
                     AdminEstatus = (adminUpdateDto.AdminEstatus ?? Status.Activo),
                     IdLgOpAdmin = adminUpdateDto.IdLgOpAdmin

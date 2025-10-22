@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace SIGEBI.Domain.Entities.Configuration
 {
     public abstract class Usuario
     {
+        [Key]
         public int Id { get; set; }
         public string Nombre { get; set; }
         public string Apellido { get; set; }
@@ -17,10 +19,7 @@ namespace SIGEBI.Domain.Entities.Configuration
         public int Edad { get; set; }
         public Genero Genero { get; set; }
         public string? Email { get; set; }
-        public DateTime? Nacimiento { get; set; }
+        public DateOnly? Nacimiento { get; set; }
         public int RolId { get; set; }
-        public Roles Rol { get; set; } = null!;
-
-        
     }
 }

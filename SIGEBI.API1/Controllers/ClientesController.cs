@@ -25,14 +25,14 @@ namespace SIGEBI.Api.Controllers
         [HttpGet("GetAllClientes")]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
-            return await _context.Clientes.ToListAsync();
+            return await _context.Cliente.ToListAsync();
         }
 
         // GET: api/Clientes/5
         [HttpGet("GetClienteById")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _context.Cliente.FindAsync(id);
 
             if (cliente == null)
             {
@@ -78,7 +78,7 @@ namespace SIGEBI.Api.Controllers
         [HttpPost("create-cliente")]
         public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
         {
-            _context.Clientes.Add(cliente);
+            _context.Cliente.Add(cliente);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCliente", new { id = cliente.Id }, cliente);
@@ -88,13 +88,13 @@ namespace SIGEBI.Api.Controllers
         [HttpDelete("remove-cliente")]
         public async Task<IActionResult> DeleteCliente(int id)
         {
-            var cliente = await _context.Clientes.FindAsync(id);
+            var cliente = await _context.Cliente.FindAsync(id);
             if (cliente == null)
             {
                 return NotFound();
             }
 
-            _context.Clientes.Remove(cliente);
+            _context.Cliente.Remove(cliente);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -102,7 +102,7 @@ namespace SIGEBI.Api.Controllers
 
         private bool ClienteExists(int id)
         {
-            return _context.Clientes.Any(e => e.Id == id);
+            return _context.Cliente.Any(e => e.Id == id);
         }
     }
 }

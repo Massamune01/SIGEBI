@@ -13,5 +13,7 @@ namespace SIGEBI.Application.Repositories.Configuration
     {
         Task<OperationResult> GetCredencialesById(int id);
         Task<OperationResult> GetCredencialesByClienteId(int clienteId);
+        Task<OperationResult> GetCredencialesByUsuario(string usuario);
+        Task<OperationResult> ClienteExist(int clienteId);
     }
 }

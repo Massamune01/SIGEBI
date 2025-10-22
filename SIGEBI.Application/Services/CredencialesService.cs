@@ -3,6 +3,7 @@ using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
+using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
 
 namespace SIGEBI.Application.Services
@@ -11,19 +12,35 @@ namespace SIGEBI.Application.Services
     {
         private readonly ICredencialesRepository _credencialesRepository;
         private readonly ILogger<CredencialesService> _logger;
+        private readonly IValidatorBase<CredencialesCreateDto> _createValidator;
+        private readonly IValidatorBase<CredencialesUpdateDto> _updateValidator;
 
-        public CredencialesService(ICredencialesRepository credencialesRepository, ILogger<CredencialesService> logger)
+        public CredencialesService(ICredencialesRepository credencialesRepository, ILogger<CredencialesService> logger, 
+            IValidatorBase<CredencialesUpdateDto> updateValidator, IValidatorBase<CredencialesCreateDto> createValidator)
         {
             _credencialesRepository = credencialesRepository;
             _logger = logger;
+            _updateValidator = updateValidator;
+            _createValidator = createValidator;
         }
 
         public async Task<ServiceResult> CreateCredenciales(CredencialesCreateDto createCredencialesDto)
         {
             ServiceResult result = new ServiceResult();
+            _logger.LogInformation("Creating new Credenciales for ClienteId: {ClienteId}", createCredencialesDto.ClienteId);
             try
             {
-                if(createCredencialesDto is null)
+                //Bussiness Validation
+                var validationResult = await _createValidator.ValidateCreate(createCredencialesDto);
+                if (!validationResult.IsValid)
+                {
+                    result.Success = false;
+                    result.Message = "Validation failed.";
+                    result.Data = validationResult.Errors;
+                    return result;
+                }
+
+                if (createCredencialesDto is null)
                 {
                     result.Success = false;
                     result.Message = "The credentials data cannot be null.";
@@ -147,6 +164,17 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             try
             {
+                _logger.LogInformation("Validating update for Credenciales with ID: {CredID}", updateCredencialesDto.Id);
+                //Bussiness Validation
+                var validationResult = await _updateValidator.ValidateUpdate(updateCredencialesDto);
+                if (!validationResult.IsValid)
+                {
+                    result.Success = false;
+                    result.Message = "Validation failed.";
+                    result.Data = validationResult.Errors;
+                    return result;
+                }
+
                 _logger.LogInformation("Updating Credenciales with ID: {CredID}", updateCredencialesDto.Id);
                 if (updateCredencialesDto is null || updateCredencialesDto.Id <= 0)
                 {

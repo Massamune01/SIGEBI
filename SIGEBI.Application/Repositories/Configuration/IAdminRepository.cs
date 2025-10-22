@@ -11,9 +11,11 @@ namespace SIGEBI.Application.Repositories.Configuration
 {
     public interface IAdminRepository : IBaseRepository<Admin>
     {
-        List<Admin> GetAdminById(int id);
-        List<Admin> GetAdminByName(string name);
-        List<Admin> GetAdminByRol(int rol);
-        List<Admin> GetAdminByStatus(Status status);
+        Task<List<Admin>> GetAdminByIdAsync(int id);
+        Task<List<Admin>> GetAdminByEmailAsync(string email);
+        Task<List<Admin>> GetAdminByNameAsync(string name);
+        Task<List<Admin>> GetAdminByCedulaAsync(string cedula);
+        Task<List<Admin>> GetAdminByRolAsync(int rol);
+        Task<List<Admin>> GetAdminByStatusAsync(Status status);
     }
 }

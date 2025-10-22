@@ -16,12 +16,13 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<LibroCreateDto> _createValidator;
         private readonly IValidatorBase<LibroUpdateDto> _updateValidator;
 
-        public LibroService(ILibrosRepository libroRepository, ILogger<LibroService> logger, IValidatorBase<LibroUpdateDto> updateValidator, IValidatorBase<LibroCreateDto> createvalidator)
+        public LibroService(ILibrosRepository libroRepository, ILogger<LibroService> logger, 
+            IValidatorBase<LibroCreateDto> createValidator, IValidatorBase<LibroUpdateDto> updateValidator)
         {
             _libroRepository = libroRepository;
             _logger = logger;
             _updateValidator = updateValidator;
-            _createValidator = createvalidator;
+            _createValidator = createValidator;
         }
 
         public async Task<ServiceResult> CreateLibroAsync(LibroCreateDto libroCreateDto)
@@ -29,16 +30,15 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             try
             {
+                _logger.LogInformation("Validating book creation for ISBN: {ISBN}", libroCreateDto.ISBN);
                 //Business validations
-                var libroValidation = _createValidator.ValidateCreate(libroCreateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var createValidator = await _createValidator.ValidateCreate(libroCreateDto);
+                if (!createValidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", createValidator.Errors);
                     return result;
                 }
-                */
 
                 _logger.LogInformation("Creating a book with title: {BookTitle}", libroCreateDto.titulo);
 
@@ -56,11 +56,10 @@ namespace SIGEBI.Application.Services
                     titulo = libroCreateDto.titulo,
                     autor = libroCreateDto.autor,
                     editorial = libroCreateDto.editorial,
-                    añoPublicacion = libroCreateDto.anioPublicacion,
+                    anoPublicacion = libroCreateDto.anioPublicacion,
                     categoria = libroCreateDto.categoria,
                     numPaginas = libroCreateDto.numPaginas,
                     cantidad = libroCreateDto.cantidad,
-                    disponible = libroCreateDto.disponible,
                     IdLgOpLibro = libroCreateDto.IdLgOpLibro,
                     Status = libroCreateDto.Status
                 };
@@ -178,15 +177,13 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var libroValidation = _updateValidator.ValidateUpdate(libroUpdateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var updateValidator = await _updateValidator.ValidateUpdate(libroUpdateDto);
+                if (!updateValidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", updateValidator.Errors);
                     return result;
                 }
-                */
 
                 _logger.LogInformation("Updating book with ID: {BookId}", libroUpdateDto.ISBN);
                 if (libroUpdateDto is null)
@@ -208,11 +205,10 @@ namespace SIGEBI.Application.Services
                     titulo = libroUpdateDto.titulo,
                     autor = libroUpdateDto.autor,
                     editorial = libroUpdateDto.editorial,
-                    añoPublicacion = libroUpdateDto.anioPublicacion,
+                    anoPublicacion = libroUpdateDto.anioPublicacion,
                     categoria = libroUpdateDto.categoria,
                     numPaginas = libroUpdateDto.numPaginas,
                     cantidad = libroUpdateDto.cantidad,
-                    disponible = libroUpdateDto.disponible,
                     IdLgOpLibro = libroUpdateDto.IdLgOpLibro,
                     Status = libroUpdateDto.Status
                 };

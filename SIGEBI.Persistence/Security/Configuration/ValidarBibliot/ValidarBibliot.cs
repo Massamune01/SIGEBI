@@ -37,9 +37,6 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarBibliot
                 .MaximumLength(80).WithMessage("El correo electrónico no puede exceder 80 caracteres.");
 
             // Nacimiento: obligatorio y no en el futuro, edad razonable
-            RuleFor(b => b.Nacimiento)
-                .NotEmpty().WithMessage("La fecha de nacimiento es obligatoria.")
-                .LessThanOrEqualTo(DateTime.Today).WithMessage("La fecha de nacimiento no puede ser en el futuro.");
             // Totales: deben ser >= 0 (y opcionalmente limitar máximos razonables)
             RuleFor(b => b.TotalDevoluciones)
                 .GreaterThanOrEqualTo(0).WithMessage("TotalDevoluciones debe ser mayor o igual a 0.");

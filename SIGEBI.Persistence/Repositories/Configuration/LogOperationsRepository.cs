@@ -20,6 +20,22 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             _logger = logger;
         }
 
+        public async Task<List<LogOperations>> GetLogOpById(int logId)
+        {
+            var result = new OperationResult();
+            try
+            {
+                _logger.LogInformation("Retrieving LogOperation entity by Id");
+                return await _context.LogOperations
+                               .Where(b => b.IdOp == logId)
+                               .ToListAsync();
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Error searching Cliente with Id");
+                return new List<LogOperations>();
+            }
+        }
         public Task<bool> Exists(Expression<Func<LogOperations, bool>> filter)
         {
             throw new NotImplementedException();
@@ -52,11 +68,11 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 .ToListAsync();
         }
 
-        public async Task<List<LogOperations>> GetByStatus(string statusOp)
+        public async Task<List<LogOperations>> GetByStatus(int statusOp)
         {
             _logger.LogInformation("Retrieving log operations with status: {StatusOp}", statusOp);
             return await _entities
-                .Where(l => l.StatusOp == statusOp)
+                .Where(l => ((int)l.StatusOp) == statusOp)
                 .ToListAsync();
 
         }

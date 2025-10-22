@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
+﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
@@ -26,14 +22,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             _logger = logger;
         }
 
-        public List<Cliente> GetClienteById(int id)
+        public async Task<List<Cliente>> GetClienteByIdAsync(int id)
         {
             try
             {
                 _logger.LogInformation("Searching Clientes with Id {Id}", id);
-                return _context.Clientes
+                return await _context.Cliente
                                .Where(b => b.Id == id)
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -42,18 +38,50 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             }
         }
 
-        public List<Cliente> GetClienteByName(string name)
+        public async Task<List<Cliente>> GetClienteByNameAsync(string name)
         {
             try
             {
                 _logger.LogInformation("Searching Clientes for nombre that contains {Name}", name);
-                return _context.Clientes
+                return await _context.Cliente
                                .Where(b => b.Nombre.Contains(name) || b.Apellido.Contains(name))
-                               .ToList();
+                               .ToListAsync();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error searching Cliente for nombre");
+                return new List<Cliente>();
+            }
+        }
+
+        public async Task<List<Cliente>> GetClienteByCedulaAsync(string cedula)
+        {
+            try
+            {
+                _logger.LogInformation("Searching Clientes for cedula that contains {Cedula}", cedula);
+                return await _context.Cliente
+                               .Where(b => b.Cedula.Contains(cedula))
+                               .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching Cliente for cedula");
+                return new List<Cliente>();
+            }
+        }
+
+        public async Task<List<Cliente>> GetClienteByEmail(string email)
+        {
+            try
+            {
+                _logger.LogInformation("Searching Clientes for email that contains {email}", email);
+                return await _context.Cliente
+                               .Where(b => b.Email.Contains(email))
+                               .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching Cliente for email");
                 return new List<Cliente>();
             }
         }

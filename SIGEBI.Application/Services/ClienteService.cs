@@ -16,12 +16,12 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<ClienteCreateDto> _createValidator;
         private readonly IValidatorBase<ClienteUpdateDto> _updateValidator;
 
-        public ClienteService(IClienteRepository clienteRepository, ILogger<ClienteService> logger, IValidatorBase<ClienteUpdateDto> updateValidator, IValidatorBase<ClienteCreateDto> createvalidator)
+        public ClienteService(IClienteRepository clienteRepository, ILogger<ClienteService> logger, IValidatorBase<ClienteCreateDto> createValidator, IValidatorBase<ClienteUpdateDto> updateValidator)
         {
             _clienteRepository = clienteRepository;
             _logger = logger;
+            _createValidator = createValidator;
             _updateValidator = updateValidator;
-            _createValidator = createvalidator;
         }
 
         public async Task<ServiceResult> CreateClienteAsync(ClienteCreateDto clienteCreateDto)
@@ -30,15 +30,14 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var clienteValidation = _createValidator.ValidateCreate(clienteCreateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var createValidation = await _createValidator.ValidateCreate(clienteCreateDto);
+                if (!createValidation.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", createValidation.Errors);
                     return result;
                 }
-                */
+                
 
                 _logger.LogInformation("Creating a client with name: {ClientName}", clienteCreateDto.Nombre);
 
@@ -57,7 +56,7 @@ namespace SIGEBI.Application.Services
                     Edad = clienteCreateDto.Edad,
                     Genero = clienteCreateDto.Genero,
                     Email = clienteCreateDto.Email,
-                    Nacimiento = clienteCreateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = clienteCreateDto.Nacimiento,
                     RolId = clienteCreateDto.RolId,
                     CapacidadPrest = clienteCreateDto.CapacidadPrest ?? 0,
                     StatusCliente = clienteCreateDto.StatusCliente,
@@ -98,7 +97,7 @@ namespace SIGEBI.Application.Services
             try
             {
                 _logger.LogInformation($"Deleting Cliente with ID: {id}");
-                var oClienteResul = await _clienteRepository.GetClienteById(id);
+                var oClienteResul = await _clienteRepository.GetClienteByIdAsync(id);
                 if (oClienteResul is null)
                 {
                     result.Success = false;
@@ -163,7 +162,7 @@ namespace SIGEBI.Application.Services
             try
             {
                 _logger.LogInformation("Retrieving client with ID: {ClientId}", id);
-                var oClienteResult = await _clienteRepository.GetClienteById(id);
+                var oClienteResult = await _clienteRepository.GetClienteByIdAsync(id);
                 if (oClienteResult is null)
                 {
                     result.Success = false;
@@ -192,15 +191,13 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var clienteValidation = _updateValidator.ValidateUpdate(clienteUpdateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var updateValidation = await _updateValidator.ValidateUpdate(clienteUpdateDto);
+                if (!updateValidation.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", updateValidation.Errors);
                     return result;
                 }
-                */
 
                 _logger.LogInformation("Updating client with ID: {ClientId}", clienteUpdateDto.Id);
                 if (clienteUpdateDto is null)
@@ -210,7 +207,7 @@ namespace SIGEBI.Application.Services
                     _logger.LogWarning(result.Message);
                     return result;
                 }
-                var existingClienteResult = await _clienteRepository.GetClienteById(clienteUpdateDto.Id);
+                var existingClienteResult = await _clienteRepository.GetClienteByIdAsync(clienteUpdateDto.Id);
                 if (existingClienteResult is null)
                 {
                     result.Success = false;
@@ -228,7 +225,7 @@ namespace SIGEBI.Application.Services
                     Edad = clienteUpdateDto.Edad,
                     Genero = clienteUpdateDto.Genero,
                     Email = clienteUpdateDto.Email,
-                    Nacimiento = clienteUpdateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = clienteUpdateDto.Nacimiento,
                     RolId = clienteUpdateDto.RolId,
                     CapacidadPrest = clienteUpdateDto.CapacidadPrest,
                     StatusCliente = clienteUpdateDto.StatusCliente,

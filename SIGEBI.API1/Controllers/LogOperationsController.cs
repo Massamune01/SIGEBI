@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Base;
 using SIGEBI.Persistence.Context;
@@ -22,14 +17,14 @@ namespace SIGEBI.Api.Controllers
         }
 
         // GET: api/LogOperations
-        [HttpGet("GetAllCrede")]
+        [HttpGet("GetAllLogOp")]
         public async Task<ActionResult<IEnumerable<LogOperations>>> GetLogOperations()
         {
             return await _context.LogOperations.ToListAsync();
         }
 
         // GET: api/LogOperations/5
-        [HttpGet("GetCredeById")]
+        [HttpGet("GetLogOpById")]
         public async Task<ActionResult<LogOperations>> GetLogOperations(int id)
         {
             var logOperations = await _context.LogOperations.FindAsync(id);
@@ -44,10 +39,10 @@ namespace SIGEBI.Api.Controllers
 
         // PUT: api/LogOperations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("update-credenciales")]
+        [HttpPut("update-LogOp")]
         public async Task<IActionResult> PutLogOperations(int id, LogOperations logOperations)
         {
-            if (id != logOperations.Id)
+            if (id != logOperations.IdOp)
             {
                 return BadRequest();
             }
@@ -75,17 +70,17 @@ namespace SIGEBI.Api.Controllers
 
         // POST: api/LogOperations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("create-credenciales")]
+        [HttpPost("create-LogOp")]
         public async Task<ActionResult<LogOperations>> PostLogOperations(LogOperations logOperations)
         {
             _context.LogOperations.Add(logOperations);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetLogOperations", new { id = logOperations.Id }, logOperations);
+            return CreatedAtAction("GetLogOperations", new { id = logOperations.IdOp }, logOperations);
         }
 
         // DELETE: api/LogOperations/5
-        [HttpDelete("remove-credenciales")]
+        [HttpDelete("remove-LogOp")]
         public async Task<IActionResult> DeleteLogOperations(int id)
         {
             var logOperations = await _context.LogOperations.FindAsync(id);
@@ -102,7 +97,7 @@ namespace SIGEBI.Api.Controllers
 
         private bool LogOperationsExists(int id)
         {
-            return _context.LogOperations.Any(e => e.Id == id);
+            return _context.LogOperations.Any(e => e.IdOp == id);
         }
     }
 }

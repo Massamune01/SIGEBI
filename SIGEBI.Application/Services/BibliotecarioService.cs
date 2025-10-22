@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Interfaces;
@@ -20,11 +15,12 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<BibliotecarioCreateDto> _createValidator;
         private readonly IValidatorBase<BibliotecarioUpdateDto> _updateValidator;
 
-        public BibliotecarioService(ILogger<BibliotecarioService> logger, IBibliotecariosRepository bibliotecariosRepository, IValidatorBase<BibliotecarioUpdateDto> updateValidator, IValidatorBase<BibliotecarioCreateDto> createvalidator)
+        public BibliotecarioService(ILogger<BibliotecarioService> logger, IBibliotecariosRepository bibliotecariosRepository, 
+            IValidatorBase<BibliotecarioCreateDto> createvalidator, IValidatorBase<BibliotecarioUpdateDto> updatevalidator)
         {
             _logger = logger;
             _bibliotecariosRepository = bibliotecariosRepository;
-            _updateValidator = updateValidator;
+            _updateValidator = updatevalidator;
             _createValidator = createvalidator;
         }
 
@@ -33,16 +29,15 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             try
             {
-                // Business validations can be added here
-                var bibliotecarioValidation = _createValidator.ValidateCreate(bibliotecarioCreateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                //Validaciones de negocio
+                var createvalidator = await _createValidator.ValidateCreate(bibliotecarioCreateDto);
+                if (!createvalidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", createvalidator.Errors);
                     return result;
                 }
-                */
+
 
                 _logger.LogInformation("Creating a bibliotecario");
                 if (bibliotecarioCreateDto is null)
@@ -58,7 +53,7 @@ namespace SIGEBI.Application.Services
                     Edad = bibliotecarioCreateDto.Edad,
                     Genero = bibliotecarioCreateDto.Genero,
                     Email = bibliotecarioCreateDto.Email,
-                    Nacimiento = bibliotecarioCreateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = bibliotecarioCreateDto.Nacimiento,
                     RolId = bibliotecarioCreateDto.RolId,
                     TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
@@ -186,15 +181,14 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             try
             {
-                var bibliotecarioValidation = _updateValidator.ValidateUpdate(bibliotecarioUpdateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                //Validaciones de negocio
+                var updatevalidator = await _updateValidator.ValidateUpdate(bibliotecarioUpdateDto);
+                if (!updatevalidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", updatevalidator.Errors);
                     return result;
                 }
-                */
 
                 _logger.LogInformation($"Updating bibliotecario with ID: {bibliotecarioUpdateDto.Id}");
                 var existingBibliotecarioResult = await _bibliotecariosRepository.GetBiblioById(bibliotecarioUpdateDto.Id);
@@ -212,7 +206,7 @@ namespace SIGEBI.Application.Services
                     Edad = bibliotecarioUpdateDto.Edad,
                     Genero = bibliotecarioUpdateDto.Genero,
                     Email = bibliotecarioUpdateDto.Email,
-                    Nacimiento = bibliotecarioUpdateDto.Nacimiento ?? DateTime.Now,
+                    Nacimiento = bibliotecarioUpdateDto.Nacimiento,
                     RolId = bibliotecarioUpdateDto.RolId,
                     TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,

@@ -1,8 +1,36 @@
 
+using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Dtos.Configuration.AdminDtos;
+using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
+using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
+using SIGEBI.Application.Dtos.Configuration.LibroDtos;
+using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
+using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Services;
+using SIGEBI.Application.Validators.Base;
+using SIGEBI.Application.Validators.Configuration.AdminValidators;
+using SIGEBI.Application.Validators.Configuration.BibliotecarioValidators;
+using SIGEBI.Application.Validators.Configuration.ClienteValidators;
+using SIGEBI.Application.Validators.Configuration.CredencialesValidators;
+using SIGEBI.Application.Validators.Configuration.LibroValidators;
+using SIGEBI.Application.Validators.Configuration.LogOpValidators;
+using SIGEBI.Application.Validators.Configuration.PrestamosValidators;
+using SIGEBI.Application.Validators.Configuration.RolValidators;
+using SIGEBI.Infraestructure.Data.Configuration;
+using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Repositories.Configuration;
+using SIGEBI.Infraestructure.Dependencies.Admin;
+using SIGEBI.Infraestructure.Dependencies.Bibliotecario;
+using SIGEBI.Infraestructure.Dependencies.Cliente;
+using SIGEBI.Infraestructure.Dependencies.Libro;
+using SIGEBI.Infraestructure.Dependencies.LogOperation;
+using SIGEBI.Infraestructure.Dependencies.Prestamo;
+using SIGEBI.Infraestructure.Dependencies.Roles;
+using SIGEBI.Infraestructure.Dependencies.Credenciales;
 
 namespace SIGEBI.API1
 {
@@ -14,17 +42,29 @@ namespace SIGEBI.API1
 
             //Var Connection String
             var connectionString = builder.Configuration.GetConnectionString("SIGEBI_BD");
-            builder.Services.AddSingleton(new SIGEBI.Infraestructure.Data.Configuration.HelperDb(connectionString));
+            //Adding HelperDb as Singleton
+            builder.Services.AddSingleton(new HelperDb(connectionString));
 
-            // Add services to the container.
+            builder.Services.AddDbContext<SIGEBIContext>(options => options.UseSqlServer(connectionString));
 
+            //Adding Services Dependencies
+            // Add dependency injection for Ef repositories
+            //Admin Dependency Injection
+            builder.Services.AddAdminDependency();
+            //Bibliotecario Dependency Injection
+            builder.Services.AddBibliotecarioDependency();
+            //Cliente Dependency Injection
+            builder.Services.AddClienteDependency();
+            //Libro Dependency Injection
+            builder.Services.AddLibroDependency();
+            //LogOperation Dependency Injection
+            builder.Services.AddLogOperationDependency();
+            //Prestamo Dependency Injection
+            builder.Services.AddPrestamoDependency();
             //Rol Dependency Injection
-            builder.Services.AddScoped<IRolRepository, RolRepositoryAdo>();
-                builder.Services.AddScoped<IRolService, RolService>();
-
-                //Credenciales Dependency Injection
-                builder.Services.AddScoped<ICredencialesRepository, CredencialesRepositoryAdo>();
-                builder.Services.AddScoped<ICredencialesService, CredencialesService>();
+            builder.Services.AddRolAdoDependency();
+            //Credenciales Dependency Injection
+            builder.Services.AddCredencialesDependency();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -22,6 +22,79 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             _logger = logger;
         }
 
+        // Checks if a Cliente with the given clienteId exists
+        public async Task<OperationResult> ClienteExist(int clienteId)
+        {
+            var result = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@ClienteId", SqlDbType.Int) { Value = clienteId }
+                };
+                var existingClientes = await _dbHelper.ExecuteReaderAsync(
+                    "SP_CHECK_CLIENTE_EXISTENCE",
+                    reader => reader.GetInt32(0),
+                    parameters
+                );
+                result.Success = true;
+                result.Data = existingClientes.Any();
+                result.Message = existingClientes.Any() ? "El cliente existe." : "El cliente no existe.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al verificar la existencia del cliente");
+                result.Success = false;
+                result.Message = "Error al verificar la existencia del cliente";
+            }
+            return result;
+        }
+
+        // Retrieves Credenciales by Usuario
+        public async Task<OperationResult> GetCredencialesByUsuario(string usuario)
+        {
+            var result = new OperationResult();
+            try
+            {
+                var parameters = new List<SqlParameter>
+                {
+                    new SqlParameter("@Usuario", SqlDbType.NVarChar, 80) { Value = usuario }
+                };
+                var credentials = await _dbHelper.ExecuteReaderAsync(
+                    "SP_GET_CRE_BY_USUARIO",
+                    reader => new CredencialesGetModel
+                    {
+                        Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                        ClienteId = reader.GetInt32(reader.GetOrdinal("ClienteId")),
+                        Usuario = reader.GetString(reader.GetOrdinal("Usuario")),
+                        PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"))
+                    },
+                    parameters
+                );
+                if (credentials != null && credentials.Any())
+                {
+                    result.Success = true;
+                    result.Data = credentials.First();
+                    result.Message = "Credenciales obtenidas correctamente.";
+                    return result;
+                }
+                else
+                {
+                    result.Success = false;
+                    result.Message = "No se encontraron credenciales para el usuario proporcionado.";
+                    return result;
+                }
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Error al obtener credenciales por usuario");
+                result.Success = false;
+                result.Message = "Error al obtener credenciales por usuario";
+                return result;
+            }
+        }
+
         public async Task<bool> Exists(Expression<Func<Credenciales, bool>> filter)
         {
             throw new NotImplementedException();

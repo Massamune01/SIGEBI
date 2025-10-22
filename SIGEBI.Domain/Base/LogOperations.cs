@@ -1,10 +1,12 @@
-﻿using System.Reflection.Metadata;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Domain.Base
 {
     public class LogOperations
     {
+        [Key]
         public int IdOp { get; set; }
         public string Entity { get; set; } = string.Empty;
         public DateTime Fecha { get; set; }
@@ -12,6 +14,6 @@ namespace SIGEBI.Domain.Base
         public string? Descripcion { get; set; }
         public DateTime? LastUpdateBy { get; set; }
         public DateTime? UpdateBy { get; set; }
-        public string StatusOp { get; set; } = string.Empty;
+        public Status StatusOp { get; set; } = Status.Activo;
     }
 }

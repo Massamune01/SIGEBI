@@ -16,10 +16,10 @@ namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
         public string? Nombre { get; set; }
         public string? Apellido { get; set; }
         public string? Cedula { get; set; }
-        public int? Edad { get; set; }
+        public int Edad { get; set; }
         public Genero Genero { get; set; }
         public string? Email { get; set; }
-        public DateTime? Nacimiento { get; set; }
+        public DateOnly? Nacimiento { get; set; }
         public int RolId { get; set; }
         public virtual int? IdLgOp { get; set; }
     }

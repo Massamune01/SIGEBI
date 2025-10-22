@@ -21,18 +21,18 @@ namespace SIGEBI.Api.Controllers
             _context = context;
         }
 
-        // GET: api/Libroes
+        // GET: api/Libro
         [HttpGet("GetAllLibros")]
         public async Task<ActionResult<IEnumerable<Libro>>> GetLibros()
         {
-            return await _context.Libros.ToListAsync();
+            return await _context.Libro.ToListAsync();
         }
 
-        // GET: api/Libroes/5
+        // GET: api/Libro/5
         [HttpGet("GetLibroById")]
-        public async Task<ActionResult<Libro>> GetLibro(int id)
+        public async Task<ActionResult<Libro>> GetLibro(Int64 id)
         {
-            var libro = await _context.Libros.FindAsync(id);
+            var libro = await _context.Libro.FindAsync(id);
 
             if (libro == null)
             {
@@ -45,7 +45,7 @@ namespace SIGEBI.Api.Controllers
         // PUT: api/Libroes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-libro")]
-        public async Task<IActionResult> PutLibro(int id, Libro libro)
+        public async Task<IActionResult> PutLibro(Int64 id, Libro libro)
         {
             if (id != libro.ISBN)
             {
@@ -78,7 +78,7 @@ namespace SIGEBI.Api.Controllers
         [HttpPost("create-libro")]
         public async Task<ActionResult<Libro>> PostLibro(Libro libro)
         {
-            _context.Libros.Add(libro);
+            _context.Libro.Add(libro);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetLibro", new { id = libro.ISBN }, libro);
@@ -86,23 +86,23 @@ namespace SIGEBI.Api.Controllers
 
         // DELETE: api/Libroes/5
         [HttpDelete("remove-libro")]
-        public async Task<IActionResult> DeleteLibro(int id)
+        public async Task<IActionResult> DeleteLibro(Int64 id)
         {
-            var libro = await _context.Libros.FindAsync(id);
+            var libro = await _context.Libro.FindAsync(id);
             if (libro == null)
             {
                 return NotFound();
             }
 
-            _context.Libros.Remove(libro);
+            _context.Libro.Remove(libro);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool LibroExists(int id)
+        private bool LibroExists(Int64 id)
         {
-            return _context.Libros.Any(e => e.ISBN == id);
+            return _context.Libro.Any(e => e.ISBN == id);
         }
     }
 }

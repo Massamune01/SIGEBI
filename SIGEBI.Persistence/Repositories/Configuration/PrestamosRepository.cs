@@ -13,12 +13,49 @@ using SIGEBI.Persistence.Security.Configuration.ValidarPrestamos;
 
 namespace SIGEBI.Persistence.Repositories.Configuration
 {
-    internal class PrestamosRepository : BaseRepository<Prestamos>, IPrestamosRepository
+    public class PrestamosRepository : BaseRepository<Prestamos>, IPrestamosRepository
     {
         private readonly ILogger<PrestamosRepository> _logger;
         public PrestamosRepository(SIGEBIContext context, ILogger<PrestamosRepository> logger) : base(context)
         {
             _logger = logger;
+        }
+
+        // Get Libro by IdLibro to check availability by column cantidad
+        public async Task<OperationResult> GetLibroForPrestamoAsync(int IdLibro)
+        {
+            var result = new OperationResult();
+            try
+            {
+                _logger.LogInformation("Retrieving Libro with Id {IdLibro} for Prestamo check", IdLibro);
+                var libro = await _context.Libro
+                    .FirstOrDefaultAsync(l => l.ISBN == IdLibro);
+                if (libro == null)
+                {
+                    result.Success = false;
+                    result.Message = "Libro not found.";
+                    _logger.LogWarning("Libro with Id {IdLibro} not found", IdLibro);
+                    return result;
+                }
+                if (libro.cantidad <= 0)
+                {
+                    result.Success = false;
+                    result.Message = "Libro is not available for loan.";
+                    _logger.LogWarning("Libro with Id {IdLibro} is not available for loan", IdLibro);
+                    return result;
+                }
+                result.Data = libro;
+                result.Success = true;
+                result.Message = "Libro is available for loan.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving Libro for Prestamo check");
+                result.Success = false;
+                result.Message = "Error retrieving Libro for Prestamo check";
+                return result;
+            }
         }
 
         public async Task<List<Prestamos>> GetPrestamosByClienteId(int clienteId)
@@ -33,7 +70,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             _logger.LogInformation("Buscando préstamo con Id {Id}", id);
 
             return await _context.Prestamos
-                .FirstOrDefaultAsync(p => p.Id == id && p.PrestamosStatus.ToString() == "Disponible");
+                .FirstOrDefaultAsync(p => p.Id == id && p.Status.ToString() == "Disponible");
         }
 
         public override async Task<OperationResult> Save(Prestamos entity)

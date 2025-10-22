@@ -44,21 +44,21 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         public async Task<List<Libro>> GetLibroByEditorial(string editorial)
         {
             return await _context.Set<Libro>()
-            .Where(l => l.editorial == editorial && l.disponible)
+            .Where(l => l.editorial == editorial)
             .ToListAsync();
         }
 
         public async Task<Libro?> GetLibroById(int isbn)
         {
             return await _context.Set<Libro>()
-            .FirstOrDefaultAsync(l => l.ISBN == isbn && l.disponible);
+            .FirstOrDefaultAsync(l => l.ISBN == isbn);
             
         }
 
         public async Task<List<Libro>> GetLibroByTitulo(string titulo)
         {
             return await _context.Set<Libro>()
-            .Where(l => l.titulo == titulo && l.disponible)
+            .Where(l => l.titulo == titulo)
             .ToListAsync();
         }
 

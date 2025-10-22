@@ -17,17 +17,17 @@ namespace SIGEBI.Api.Controllers
         }
 
         // GET: api/Admins
-        [HttpGet("GetAllAdmins")]
-        public async Task<ActionResult<IEnumerable<Admin>>> GetAdmins()
+        [HttpGet("GetAllAdmin")]
+        public async Task<ActionResult<IEnumerable<Admin>>> GetAdmin()
         {
-            return await _context.Admins.ToListAsync();
+            return await _context.Admin.ToListAsync();
         }
 
         // GET: api/Admins/5
         [HttpGet("GetAdminById")]
         public async Task<ActionResult<Admin>> GetAdmin(int id)
         {
-            var admin = await _context.Admins.FindAsync(id);
+            var admin = await _context.Admin.FindAsync(id);
 
             if (admin == null)
             {
@@ -73,7 +73,7 @@ namespace SIGEBI.Api.Controllers
         [HttpPost("create-admin")]
         public async Task<ActionResult<Admin>> PostAdmin(Admin admin)
         {
-            _context.Admins.Add(admin);
+            _context.Admin.Add(admin);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetAdmin", new { id = admin.Id }, admin);
@@ -83,13 +83,13 @@ namespace SIGEBI.Api.Controllers
         [HttpDelete("remove-admin")]
         public async Task<IActionResult> DeleteAdmin(int id)
         {
-            var admin = await _context.Admins.FindAsync(id);
+            var admin = await _context.Admin.FindAsync(id);
             if (admin == null)
             {
                 return NotFound();
             }
 
-            _context.Admins.Remove(admin);
+            _context.Admin.Remove(admin);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -97,7 +97,7 @@ namespace SIGEBI.Api.Controllers
 
         private bool AdminExists(int id)
         {
-            return _context.Admins.Any(e => e.Id == id);
+            return _context.Admin.Any(e => e.Id == id);
         }
     }
 }

@@ -10,11 +10,11 @@ namespace SIGEBI.Application.Dtos.Configuration.ClienteDtos
 {
     public record ClienteUpdateDto : UsuarioUpdateDto
     {
-        public int? CapacidadPrest { get; set; }
-        public int? TotalDevolRestrasadas { get; set; }
-        public int? PrestamosActivos { get; set; }
-        public int? TotalDevoluciones { get; set; } = 0;
-        public int? TotalPrestamos { get; set; } = 0;
-        public Status? StatusCliente { get; set; }
+        public int CapacidadPrest { get; set; }
+        public int TotalDevolRestrasadas { get; set; }
+        public int PrestamosActivos { get; set; }
+        public int TotalDevoluciones { get; set; } = 0;
+        public int TotalPrestamos { get; set; } = 0;
+        public Status StatusCliente { get; set; }
     }
 }

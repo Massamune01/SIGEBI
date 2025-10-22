@@ -16,13 +16,12 @@ namespace SIGEBI.Application.Services
         private readonly IValidatorBase<PrestamoUpdateDto> _updateValidator;
 
         public PrestamosServices(IPrestamosRepository prestamosRepository, ILogger<PrestamosServices> logger, 
-            IValidatorBase<PrestamoCreateDto> createValidator, IValidatorBase<PrestamoUpdateDto> updatevalidator)
+            IValidatorBase<PrestamoCreateDto> createValidator, IValidatorBase<PrestamoUpdateDto> updateValidator)
         {
             _prestamosRepository = prestamosRepository;
             _logger = logger;
             _createValidator = createValidator;
-            _updateValidator = updatevalidator;
-
+            _updateValidator = updateValidator;
         }
 
         public async Task<ServiceResult> CreatePrestamoAsync(PrestamoCreateDto prestamoCreateDto)
@@ -31,15 +30,14 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business Validation logic to create a loan
-                var prestamoValidation = _createValidator.ValidateCreate(prestamoCreateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var prestamoValidation = await _createValidator.ValidateCreate(prestamoCreateDto);
+                
+                if (!prestamoValidation.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", prestamoValidation.Errors);
                     return result;
                 }
-                */
 
 
                 _logger.LogInformation("Creating a loan for client ID: {ClientId}", prestamoCreateDto.IdCliente);
@@ -171,15 +169,15 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business Validation logic to create a loan
-                var prestamoValidation = _updateValidator.ValidateUpdate(prestamoUpdateDto);
-                /* Todavia no se implementa la validacion
-                if (!bibliotecarioValidation.IsValid)
+                var prestamoValidation = await _updateValidator.ValidateUpdate(prestamoUpdateDto);
+
+                if (!prestamoValidation.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = "Validation errors: " + string.Join(", ", prestamoValidation.Errors);
                     return result;
                 }
-                */
+
                 _logger.LogInformation("Updating loan with ID: {LoanId}", prestamoUpdateDto.Id);
                 if (prestamoUpdateDto is null)
                 {
@@ -198,7 +196,7 @@ namespace SIGEBI.Application.Services
                 {
                     Id = prestamoUpdateDto.Id,
                     DateWasDevol = prestamoUpdateDto.DateWasDevol,
-                    PrestamosStatus = prestamoUpdateDto.PrestamosStatus,
+                    Status = prestamoUpdateDto.PrestamosStatus,
                     IdLibros = existingPrestamo.IdLibros,
                     IdCliente = existingPrestamo.IdCliente,
                     DatePrest = existingPrestamo.DatePrest,

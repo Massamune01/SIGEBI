@@ -16,6 +16,5 @@ namespace SIGEBI.Domain.Entities.Configuration
         public int PrestamosActivos { get; set; }
         public Status StatusCliente { get; set; }
         public int? IdLgOpCliente { get; set; }
-        public Credenciales Credenciales { get; set; }
     }
 }
