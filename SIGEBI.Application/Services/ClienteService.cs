@@ -6,6 +6,7 @@ using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -15,13 +16,17 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<ClienteService> _logger;
         private readonly IValidatorBase<ClienteCreateDto> _createValidator;
         private readonly IValidatorBase<ClienteUpdateDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
-        public ClienteService(IClienteRepository clienteRepository, ILogger<ClienteService> logger, IValidatorBase<ClienteCreateDto> createValidator, IValidatorBase<ClienteUpdateDto> updateValidator)
+        public ClienteService(IClienteRepository clienteRepository, ILogger<ClienteService> logger, 
+            IValidatorBase<ClienteCreateDto> createValidator, IValidatorBase<ClienteUpdateDto> updateValidator
+            , ICacheService cacheService)
         {
             _clienteRepository = clienteRepository;
             _logger = logger;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateClienteAsync(ClienteCreateDto clienteCreateDto)
@@ -80,6 +85,7 @@ namespace SIGEBI.Application.Services
                 result.Data = oClienteResult;
                 result.Message = "Client created successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -117,6 +123,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Message = "Bibliotecario deleted successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -130,6 +137,15 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetAllClientesAsync()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Clientes";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<ClienteDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Clientes retrieved from cache.";
+                return result;
+            }
             try
             {
                 _logger.LogInformation("Retrieving all clients.");
@@ -141,6 +157,9 @@ namespace SIGEBI.Application.Services
                     _logger.LogWarning(result.Message);
                     return result;
                 }
+
+                _cacheService.Set(cacheKey, oClienteResult.Data);
+
                 result.Success = true;
                 result.Data = oClienteResult.Data;
                 result.Message = "Clients retrieved successfully.";
@@ -248,6 +267,7 @@ namespace SIGEBI.Application.Services
                     result.Data = updateResult.Data;
                     result.Message = "Client updated successfully.";
                     _logger.LogInformation(result.Message);
+                    _cacheService.ClearKeys();
                     return result;
                 }
             }

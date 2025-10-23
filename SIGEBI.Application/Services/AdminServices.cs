@@ -6,6 +6,7 @@ using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Enums;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -15,14 +16,17 @@ namespace SIGEBI.Application.Services
         private readonly IAdminRepository _adminRepository;
         private readonly IValidatorBase<AdminCreateDto> _createValidator;
         private readonly IValidatorBase<AdminUpdateDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
         public AdminServices(IAdminRepository adminRepository, ILogger<AdminServices> logger, 
-            IValidatorBase<AdminCreateDto> createValidator, IValidatorBase<AdminUpdateDto> updateValidator)
+            IValidatorBase<AdminCreateDto> createValidator, IValidatorBase<AdminUpdateDto> updateValidator
+            , ICacheService cacheService)
         {
             _logger = logger;
             _adminRepository = adminRepository;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _cacheService = cacheService;
 
         }
 
@@ -71,6 +75,7 @@ namespace SIGEBI.Application.Services
                     result.Data = oResultAdmin;
                     result.Message = "Admin created successfully.";
                     _logger.LogInformation(result.Message);
+                    _cacheService.ClearKeys();
                 }
             }
             catch(Exception ex)
@@ -114,7 +119,8 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Message = "Admin deleted successfully.";
                 _logger.LogInformation(result.Message);
-                
+                _cacheService.ClearKeys();
+
             }
             catch(Exception ex)
             {
@@ -157,18 +163,34 @@ namespace SIGEBI.Application.Services
 
         public async Task<ServiceResult> GetAllAdminAsync()
         {
+            const string cacheKey = "ALL_ADMIN";
             ServiceResult result = new ServiceResult();
+            
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if(_cacheService.TryGet(cacheKey,out List<AdminDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Admins retrieved from cache.";
+                return result;
+            }
+
             try
             {
+                
+
                 _logger.LogInformation("Retrieving all admins");
                 var existingAdminsResult =  _adminRepository.GetAll();
-                if (existingAdminsResult is null)
+                if (existingAdminsResult.Result.Data is null)
                 {
                     _logger.LogWarning("No admins found.");
                     result.Success = false;
                     result.Message = "No admins found.";
                     return result;
                 }
+
+                _cacheService.Set(cacheKey, existingAdminsResult.Result.Data);
+
                 result.Success = true;
                 result.Data = existingAdminsResult.Result.Data;
                 result.Message = "Admins retrieved successfully.";
@@ -240,6 +262,7 @@ namespace SIGEBI.Application.Services
                 result.Data = updateResult.Data;
                 result.Message = "Admin updated successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
             }
             catch(Exception ex)
             {

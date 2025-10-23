@@ -1,12 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Enums;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -16,14 +18,17 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<LogOperationsService> _logger;
         private readonly IValidatorBase<CreateLogOperationDto> _createValidator;
         private readonly IValidatorBase<UpdateLogOperationDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
         public LogOperationsService(ILogOperationsRepository logOperationsRepository, ILogger<LogOperationsService> logger, 
-            IValidatorBase<CreateLogOperationDto> createValidator, IValidatorBase<UpdateLogOperationDto> updateValidator)
+            IValidatorBase<CreateLogOperationDto> createValidator, IValidatorBase<UpdateLogOperationDto> updateValidator
+            , ICacheService cacheService)
         {
             _logOperationsRepository = logOperationsRepository;
             _logger = logger;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateLogOperationsAsync(CreateLogOperationDto logOpCreateDto)
@@ -70,6 +75,7 @@ namespace SIGEBI.Application.Services
                 result.Data = createdLogOperation;
                 result.Message = "Log operation created successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -109,6 +115,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Message = "Log operation deleted successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch(Exception ex)
@@ -123,6 +130,15 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetAllLogOperationsAsync()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_LogOps";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<LogOperationsDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "LogOps retrieved from cache.";
+                return result;
+            }
             try
             {
                 _logger.LogInformation("Retrieving all log operations.");
@@ -138,6 +154,7 @@ namespace SIGEBI.Application.Services
                 result.Data = logOperations.Data;
                 result.Message = "Log operations retrieved successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.Set(cacheKey, result.Data);
                 return result;
             }
             catch (Exception ex)
@@ -230,6 +247,7 @@ namespace SIGEBI.Application.Services
                 result.Data = updatedLogOperationResult.Data;
                 result.Message = "Log operation updated successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)

@@ -31,6 +31,8 @@ using SIGEBI.Infraestructure.Dependencies.LogOperation;
 using SIGEBI.Infraestructure.Dependencies.Prestamo;
 using SIGEBI.Infraestructure.Dependencies.Roles;
 using SIGEBI.Infraestructure.Dependencies.Credenciales;
+using SIGEBI.Domain.Interfaces.Cache;
+using SIGEBI.Infraestructure.Cache;
 
 namespace SIGEBI.API1
 {
@@ -46,6 +48,9 @@ namespace SIGEBI.API1
             builder.Services.AddSingleton(new HelperDb(connectionString));
 
             builder.Services.AddDbContext<SIGEBIContext>(options => options.UseSqlServer(connectionString));
+
+            // Add Dependency injection for CacheService
+            builder.Services.AddSingleton<ICacheService,  CacheLRUService>();
 
             //Adding Services Dependencies
             // Add dependency injection for Ef repositories

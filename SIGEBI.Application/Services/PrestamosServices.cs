@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -14,14 +16,17 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<PrestamosServices> _logger;
         private readonly IValidatorBase<PrestamoCreateDto> _createValidator;
         private readonly IValidatorBase<PrestamoUpdateDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
         public PrestamosServices(IPrestamosRepository prestamosRepository, ILogger<PrestamosServices> logger, 
-            IValidatorBase<PrestamoCreateDto> createValidator, IValidatorBase<PrestamoUpdateDto> updateValidator)
+            IValidatorBase<PrestamoCreateDto> createValidator, IValidatorBase<PrestamoUpdateDto> updateValidator
+            , ICacheService cacheService)
         {
             _prestamosRepository = prestamosRepository;
             _logger = logger;
             _createValidator = createValidator;
             _updateValidator = updateValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreatePrestamoAsync(PrestamoCreateDto prestamoCreateDto)
@@ -65,6 +70,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = OpPrestamo;
                 result.Message = "Loan created successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -98,6 +104,7 @@ namespace SIGEBI.Application.Services
                 }
                 result.Success = true;
                 result.Message = "Loan deleted successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -112,19 +119,30 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetAllPrestamosAsync()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Prestamos";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<PrestamoDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Prestamos retrieved from cache.";
+                return result;
+            }
+
             try
             {
                 _logger.LogInformation("Retrieving all loans.");
-                var prestamos =  _prestamosRepository.GetAll();
-                if (prestamos is null)
+                var prestamos =  await _prestamosRepository.GetAll();
+                if (prestamos.Data is null)
                 {
                     result.Success = false;
                     result.Message = "No loans found.";
                     return result;
                 }
                 result.Success = true;
-                result.Data = prestamos;
+                result.Data = prestamos.Data;
                 result.Message = "Loans retrieved successfully.";
+                _cacheService.Set(cacheKey, result.Data);
                 return result;
             }
             catch (Exception ex)
@@ -213,6 +231,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = updatedPrestamo;
                 result.Message = "Loan updated successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)

@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -14,14 +16,17 @@ namespace SIGEBI.Application.Services
         private readonly IBibliotecariosRepository _bibliotecariosRepository;
         private readonly IValidatorBase<BibliotecarioCreateDto> _createValidator;
         private readonly IValidatorBase<BibliotecarioUpdateDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
         public BibliotecarioService(ILogger<BibliotecarioService> logger, IBibliotecariosRepository bibliotecariosRepository, 
-            IValidatorBase<BibliotecarioCreateDto> createvalidator, IValidatorBase<BibliotecarioUpdateDto> updatevalidator)
+            IValidatorBase<BibliotecarioCreateDto> createvalidator, IValidatorBase<BibliotecarioUpdateDto> updatevalidator
+            , ICacheService cacheService)
         {
             _logger = logger;
             _bibliotecariosRepository = bibliotecariosRepository;
             _updateValidator = updatevalidator;
             _createValidator = createvalidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateBibliotecarioAsync(BibliotecarioCreateDto bibliotecarioCreateDto)
@@ -73,6 +78,7 @@ namespace SIGEBI.Application.Services
                 result.Data = createdBibliotecario;
                 result.Message = "Bibliotecario created successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -109,6 +115,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Message = "Bibliotecario deleted successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -122,6 +129,17 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetAllBibliotecariosAsync()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Bibliotecario";
+
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<BibliotecarioDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Bibliotecarios retrieved from cache.";
+                return result;
+            }
+            
             try
             {
                 _logger.LogInformation("Retrieving all bibliotecarios");
@@ -132,10 +150,14 @@ namespace SIGEBI.Application.Services
                     result.Message = "No bibliotecarios found.";
                     return result;
                 }
+                
+                _cacheService.Set(cacheKey, bibliotecarios.Data);
+
                 result.Success = true;
-                result.Data = bibliotecarios;
+                result.Data = bibliotecarios.Data;
                 result.Message = "Bibliotecarios retrieved successfully.";
                 _logger.LogInformation(result.Message);
+                
                 return result;
             }
             catch (Exception ex)
@@ -228,6 +250,7 @@ namespace SIGEBI.Application.Services
                 result.Data = updateResult.Data;
                 result.Message = "Bibliotecario updated successfully.";
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)

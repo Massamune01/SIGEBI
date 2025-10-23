@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -14,14 +16,17 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<CredencialesService> _logger;
         private readonly IValidatorBase<CredencialesCreateDto> _createValidator;
         private readonly IValidatorBase<CredencialesUpdateDto> _updateValidator;
+        private readonly ICacheService _cacheService;
 
         public CredencialesService(ICredencialesRepository credencialesRepository, ILogger<CredencialesService> logger, 
-            IValidatorBase<CredencialesUpdateDto> updateValidator, IValidatorBase<CredencialesCreateDto> createValidator)
+            IValidatorBase<CredencialesUpdateDto> updateValidator, IValidatorBase<CredencialesCreateDto> createValidator
+            , ICacheService cacheService)
         {
             _credencialesRepository = credencialesRepository;
             _logger = logger;
             _updateValidator = updateValidator;
             _createValidator = createValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateCredenciales(CredencialesCreateDto createCredencialesDto)
@@ -57,6 +62,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = oResultCredenciales;
                 result.Message = "Credenciales created successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -71,6 +77,15 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetCredencialesAll()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Credenciales";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<CredencialesDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Credenciales retrieved from cache.";
+                return result;
+            }
             try
             {
                 _logger.LogInformation("Retrieving all credentials.");
@@ -84,6 +99,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = oCredencialesList;
                 result.Message = "Credenciales retrieved successfully.";
+                _cacheService.Set(cacheKey, result.Data);
             }
             catch (Exception ex)
             {
@@ -149,6 +165,14 @@ namespace SIGEBI.Application.Services
                     result.Message = oResultCredenciales.Message;
                     return result;
                 }
+
+                result.Success = true;
+                result.Data = oResultCredenciales.Data;
+                result.Message = oResultCredenciales.Message;
+
+                _cacheService.ClearKeys();
+
+                return result;
             }
             catch(Exception ex)
             {
@@ -206,6 +230,8 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Message = "Update Credenciales Succesfully.";
                 result.Data = oResultCredenciales.Data;
+
+                _cacheService.ClearKeys();
             }
             catch(Exception ex)
             {

@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -14,10 +16,12 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<RolService> _logger;
         private readonly IValidatorBase<RolCreateDto> _rolCreateValidator;
         private readonly IValidatorBase<RolUpdateDto> _rolUpdateValidator;
+        private readonly ICacheService _cacheService;
 
 
         public RolService(IRolRepository rolRepository, ILogger<RolService> logger, 
-            IValidatorBase<RolUpdateDto> rolUpdateValidator, IValidatorBase<RolCreateDto> createValidator)
+            IValidatorBase<RolUpdateDto> rolUpdateValidator, IValidatorBase<RolCreateDto> createValidator
+            , ICacheService cacheService)
         {
             _rolRepository = rolRepository;
             _logger = logger;
@@ -60,6 +64,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = existingRol;
                 result.Message = "Role created successfully.";
+                _cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -109,6 +114,7 @@ namespace SIGEBI.Application.Services
                     result.Success = true;
                     result.Message = "Role remove succesfuly";
                     result.Data = ResultRol.Data;
+                    _cacheService.ClearKeys();
                 }
             }
             catch (Exception ex)
@@ -166,6 +172,7 @@ namespace SIGEBI.Application.Services
                     result.Success = true;
                     result.Message = "Update succesfuly.";
                     result.Data = ResultRol.Data;
+                    _cacheService.ClearKeys();
                 }
 
             }
@@ -181,6 +188,16 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetRolAll()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Roles";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<RolDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Roles retrieved from cache.";
+                return result;
+            }
+
             try
             {
                 _logger.LogInformation("Retrieving all roles.");
@@ -192,7 +209,9 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
                 result.Success = true;
-                result.Data = oResultGetAll;
+                result.Data = oResultGetAll.Data;
+                result.Message = oResultGetAll.Message;
+                _cacheService.Set(cacheKey, oResultGetAll.Data);
                 return result;
 
             }

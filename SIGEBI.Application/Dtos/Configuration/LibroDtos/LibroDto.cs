@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,16 +10,16 @@ namespace SIGEBI.Application.Dtos.Configuration.LibroDtos
 {
     public class LibroDto
     {
-        public int ISBN { get; set; }
-        public string Titulo { get; set; } = null!;
-        public string Autor { get; set; } = null!;
-        public string Editorial { get; set; } = null!;
-        public int AnioPublicacion { get; set; }
-        public string Categoria { get; set; } = null!;
-        public int NumPaginas { get; set; }
-        public int Cantidad { get; set; }
-        public bool Disponible { get; set; }
+        [Key]
+        public Int64 ISBN { get; set; }
+        public string titulo { get; set; }
+        public string autor { get; set; }
+        public string editorial { get; set; }
+        public int anoPublicacion { get; set; }
+        public string categoria { get; set; }
+        public int numPaginas { get; set; }
+        public int cantidad { get; set; }
+        public Status Status { get; set; }
         public int? IdLgOpLibro { get; set; }
-        public Status Status { get; set; } = Status.Activo;
     }
 }

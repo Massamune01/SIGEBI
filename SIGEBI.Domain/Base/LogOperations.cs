@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Reflection.Metadata;
 using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Domain.Base

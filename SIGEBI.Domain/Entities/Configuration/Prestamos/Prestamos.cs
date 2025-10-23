@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Numerics;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Enums;
 
@@ -6,6 +7,7 @@ namespace SIGEBI.Domain.Entities.Configuration.Prestamos
 {
     public class Prestamos
     {
+        [Key]
         public int Id { get; set; }
         public DateTime DatePrest { get; set; }
         public DateTime DateDevol {  get; set; }

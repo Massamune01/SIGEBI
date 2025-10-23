@@ -1,11 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services
 {
@@ -15,14 +17,16 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<LibroService> _logger;
         private readonly IValidatorBase<LibroCreateDto> _createValidator;
         private readonly IValidatorBase<LibroUpdateDto> _updateValidator;
-
+        private readonly ICacheService _cacheService;
         public LibroService(ILibrosRepository libroRepository, ILogger<LibroService> logger, 
-            IValidatorBase<LibroCreateDto> createValidator, IValidatorBase<LibroUpdateDto> updateValidator)
+            IValidatorBase<LibroCreateDto> createValidator, IValidatorBase<LibroUpdateDto> updateValidator
+            , ICacheService cacheService)
         {
             _libroRepository = libroRepository;
             _logger = logger;
             _updateValidator = updateValidator;
             _createValidator = createValidator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateLibroAsync(LibroCreateDto libroCreateDto)
@@ -73,6 +77,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = createdLibro;
                 result.Message = "Book created successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -106,6 +111,7 @@ namespace SIGEBI.Application.Services
                 }
                 result.Success = true;
                 result.Message = "Book deleted successfully.";
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
@@ -120,6 +126,16 @@ namespace SIGEBI.Application.Services
         public async Task<ServiceResult> GetAllLibrosAsync()
         {
             ServiceResult result = new ServiceResult();
+            const string cacheKey = "ALL_Libros";
+            _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
+            if (_cacheService.TryGet(cacheKey, out List<LibroDto> list))
+            {
+                result.Success = true;
+                result.Data = list;
+                result.Message = "Libros retrieved from cache.";
+                return result;
+            }
+
             try
             {
                 _logger.LogInformation("Retrieving all books.");
@@ -130,9 +146,11 @@ namespace SIGEBI.Application.Services
                     result.Message = "No books found.";
                     return result;
                 }
+
                 result.Success = true;
                 result.Data = libros;
                 result.Message = "Books retrieved successfully.";
+                _cacheService.Set(cacheKey, result.Data);
                 return result;
             }
             catch (Exception ex)
@@ -224,6 +242,7 @@ namespace SIGEBI.Application.Services
                 result.Message = "Book updated successfully.";
                 result.Data = updateResult.Data;
                 _logger.LogInformation(result.Message);
+                _cacheService.ClearKeys();
                 return result;
             }
             catch (Exception ex)
