@@ -11,7 +11,7 @@ namespace SIGEBI.Application.Dtos.Configuration.PrestamosDtos
         public DateTime DatePrest { get; set; }   
         public DateTime DateDevol { get; set; }             
         
-        public int IdLibros { get; set; }                
+        public Int64 IdLibros { get; set; }                
         public int IdCliente { get; set; }
         public int? IdLgOpLibro { get; set; }
     }

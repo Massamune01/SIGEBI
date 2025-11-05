@@ -1,53 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Base;
+using SIGEBI.Domain.Base;
+
 
 namespace SIGEBI.Persistence.Security.Configuration.ValidadLogOp
 {
-    using FluentValidation;
-    using SIGEBI.Domain.Base;
-
-    public sealed class ValidarLogOperations : AbstractValidator<LogOperations>
+    public sealed class ValidarLogOperations
     {
-        public ValidarLogOperations()
+        public OperationResult ValidateLogOperation(LogOperations log)
         {
-            // Validar objeto no nulo
-            RuleFor(l => l).NotNull().WithMessage("El objeto LogOperation no puede ser nulo.");
+            var result = new OperationResult();
+
+            if (log == null)
+            {
+                result.Success = false;
+                result.Message = "El objeto LogOperation no puede ser nulo.";
+                return result;
+            }
 
             // Entity obligatorio y máximo 90 caracteres
-            RuleFor(l => l.Entity)
-                .NotEmpty().WithMessage("El campo Entity no puede estar vacío.")
-                .MaximumLength(90).WithMessage("El campo Entity no puede exceder los 90 caracteres.");
+            if (string.IsNullOrWhiteSpace(log.Entity))
+            {
+                result.Success = false;
+                result.Message = "El campo Entity no puede estar vacío.";
+                return result;
+            }
+
+            if (log.Entity.Length > 90)
+            {
+                result.Success = false;
+                result.Message = "El campo Entity no puede exceder los 90 caracteres.";
+                return result;
+            }
 
             // Fecha obligatoria y no en el futuro
-            RuleFor(l => l.Fecha)
-                .NotEmpty().WithMessage("La fecha es obligatoria.")
-                .LessThanOrEqualTo(DateTime.Now).WithMessage("La fecha no puede estar en el futuro.");
+            if (log.Fecha == default)
+            {
+                result.Success = false;
+                result.Message = "La fecha es obligatoria.";
+                return result;
+            }
+
+            if (log.Fecha > DateTime.Now)
+            {
+                result.Success = false;
+                result.Message = "La fecha no puede estar en el futuro.";
+                return result;
+            }
 
             // TypeOperation obligatorio y máximo 100 caracteres
-            RuleFor(l => l.TypeOperation)
-                .NotEmpty().WithMessage("El campo TypeOperation no puede estar vacío.")
-                .MaximumLength(100).WithMessage("El campo TypeOperation no puede exceder los 100 caracteres.");
+            if (string.IsNullOrWhiteSpace(log.TypeOperation))
+            {
+                result.Success = false;
+                result.Message = "El campo TypeOperation no puede estar vacío.";
+                return result;
+            }
+
+            if (log.TypeOperation.Length > 100)
+            {
+                result.Success = false;
+                result.Message = "El campo TypeOperation no puede exceder los 100 caracteres.";
+                return result;
+            }
 
             // Descripción opcional pero máximo 100 caracteres
-            RuleFor(l => l.Descripcion)
-                .MaximumLength(100).WithMessage("La descripción no puede exceder los 100 caracteres.");
-            // LastUpdateBy y UpdateBy opcionales, pero deben ser fechas válidas si se proporcionan
-            RuleFor(l => l.LastUpdateBy)
-                .LessThanOrEqualTo(DateTime.Now)
-                .When(l => l.LastUpdateBy.HasValue)
-                .WithMessage("LastUpdateBy no puede estar en el futuro.");
+            if (!string.IsNullOrEmpty(log.Descripcion) && log.Descripcion.Length > 100)
+            {
+                result.Success = false;
+                result.Message = "La descripción no puede exceder los 100 caracteres.";
+                return result;
+            }
 
-            RuleFor(l => l.UpdateBy)
-                .LessThanOrEqualTo(DateTime.Now)
-                .When(l => l.UpdateBy.HasValue)
-                .WithMessage("UpdateBy no puede estar en el futuro.");
+            // LastUpdateBy y UpdateBy opcionales, pero deben ser fechas válidas si se proporcionan
+            if (log.LastUpdateBy.HasValue && log.LastUpdateBy > DateTime.Now)
+            {
+                result.Success = false;
+                result.Message = "LastUpdateBy no puede estar en el futuro.";
+                return result;
+            }
+
+            if (log.UpdateBy.HasValue && log.UpdateBy > DateTime.Now)
+            {
+                result.Success = false;
+                result.Message = "UpdateBy no puede estar en el futuro.";
+                return result;
+            }
+
+            result.Success = true;
+            return result;
         }
     }
-
 }

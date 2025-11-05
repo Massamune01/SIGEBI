@@ -126,15 +126,15 @@ namespace SIGEBI.Persistence.Repositories.Configuration
 
             try
             {
-                var validator = new ValidarBibliot();
+                var validator = new ValidarBibliotecario();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateBibliotecario(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving Bibliotecario entity.");
@@ -175,14 +175,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             var result = new OperationResult();
             try
             {
-                var validator = new ValidarBibliot();
+                var validator = new ValidarBibliotecario();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateBibliotecario(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
+                    result.Message = validationResult.Message;
                     return result;
                 }
 

@@ -112,13 +112,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarLogOperations();
 
-                var validationResult = validator.Validate(entity);
+                var validationResult = validator.ValidateLogOperation(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving LogOperation for entity: {Entity}", entity.Entity);
@@ -141,14 +141,15 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarLogOperations();
 
-                var validationResult = validator.Validate(entity);
+                var validationResult = validator.ValidateLogOperation(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
+
                 _logger.LogInformation("Updating LogOperation for entity: {Entity}", entity.Entity);
                 await base.Update(entity);
                 await _context.SaveChangesAsync();

@@ -8,6 +8,6 @@ namespace SIGEBI.Application.Repositories.Configuration
     {
         Task<Prestamos?> GetPrestamosById(int id);
         Task<List<Prestamos>> GetPrestamosByClienteId(int clienteId);
-        Task<OperationResult> GetLibroForPrestamoAsync(int IdLibro);
+        Task<OperationResult> GetLibroForPrestamoAsync(Int64 IdLibro);
     }
 }

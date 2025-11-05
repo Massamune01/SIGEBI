@@ -9,47 +9,78 @@ using SIGEBI.Domain.Entities.Configuration.Prestamos;
 
 namespace SIGEBI.Persistence.Security.Configuration.ValidarPrestamos
 {
-    public class ValidarPrestamos : AbstractValidator<Prestamos>
+    public class ValidarPrestamos
     {
-        public ValidarPrestamos()
+        public OperationResult ValidatePrestamo(Prestamos p)
         {
-            // Validación general
-            RuleFor(p => p).NotNull().WithMessage("El objeto Prestamo no puede ser nulo.");
+            var result = new OperationResult();
 
-            // DatePrest (fecha del préstamo) - obligatoria y no en el futuro
-            RuleFor(p => p.DatePrest)
-                .NotEmpty().WithMessage("La fecha de préstamo es obligatoria.")
-                .LessThanOrEqualTo(DateTime.Now).WithMessage("La fecha de préstamo no puede estar en el futuro.");
+            // Validar objeto nulo
+            if (p == null)
+            {
+                result.Success = false;
+                result.Message = "El objeto Prestamo no puede ser nulo.";
+                return result;
+            }
 
-            // DateDevol (fecha de devolución pactada) - obligatoria y posterior a la de préstamo
-            RuleFor(p => p.DateDevol)
-                .NotEmpty().WithMessage("La fecha de devolución es obligatoria.")
-                .GreaterThan(p => p.DatePrest).WithMessage("La fecha de devolución debe ser posterior a la fecha de préstamo.");
+            // DatePrest (fecha del préstamo)
+            if (p.DatePrest == default)
+            {
+                result.Success = false;
+                result.Message = "La fecha de préstamo es obligatoria.";
+                return result;
+            }
 
-            // DateWasDevol (fecha en que realmente devolvió el libro) - opcional, pero no antes del préstamo
-            RuleFor(p => p.DateWasDevol)
-                .GreaterThanOrEqualTo(p => p.DatePrest)
-                .When(p => p.DateWasDevol.HasValue)
-                .WithMessage("La fecha real de devolución no puede ser anterior a la fecha de préstamo.");
+            if (p.DatePrest > DateTime.Now)
+            {
+                result.Success = false;
+                result.Message = "La fecha de préstamo no puede estar en el futuro.";
+                return result;
+            }
 
-            // Status - obligatorio y debe estar entre los permitidos
-            RuleFor(p => p.Status)
-                .NotEmpty().WithMessage("El estado es obligatorio.")
-                .Must(s => s.Equals("Disponible" ))
-                .WithMessage("El estado debe ser 'Disponible' o 'Inactivo'.");
+            // DateDevol (fecha de devolución pactada)
+            if (p.DateDevol == default)
+            {
+                result.Success = false;
+                result.Message = "La fecha de devolución es obligatoria.";
+                return result;
+            }
 
-            // IdLibros - obligatorio (no debe ser cero)
-            RuleFor(p => p.IdLibros)
-                .GreaterThan(0).WithMessage("Debe especificar un libro válido.");
+            if (p.DateDevol <= p.DatePrest)
+            {
+                result.Success = false;
+                result.Message = "La fecha de devolución debe ser posterior a la fecha de préstamo.";
+                return result;
+            }
 
-            // IdCliente - obligatorio (no debe ser cero)
-            RuleFor(p => p.IdCliente)
-                .GreaterThan(0).WithMessage("Debe especificar un cliente válido.");
+            // DateWasDevol (fecha real de devolución, opcional)
+            if (p.DateWasDevol.HasValue && p.DateWasDevol.Value < p.DatePrest)
+            {
+                result.Success = false;
+                result.Message = "La fecha real de devolución no puede ser anterior a la fecha de préstamo.";
+                return result;
+            }
 
-            // IdLgOpPrest - opcional, pero si se manda debe ser positivo
-            RuleFor(p => p.IdLgOpPrest)
-                .GreaterThan(0).When(p => p.IdLgOpPrest.HasValue)
-                .WithMessage("El Id de LogOperation, si se especifica, debe ser mayor a 0.");
+            // IdLibro
+            if (p.IdLibros <= 0)
+            {
+                result.Success = false;
+                result.Message = "Debe especificar un libro válido.";
+                return result;
+            }
+
+            // IdCliente
+            if (p.IdCliente <= 0)
+            {
+                result.Success = false;
+                result.Message = "Debe especificar un cliente válido.";
+                return result;
+            }
+
+            // Si todo es válido
+            result.Success = true;
+            result.Message = "Validación exitosa.";
+            return result;
         }
     }
 }

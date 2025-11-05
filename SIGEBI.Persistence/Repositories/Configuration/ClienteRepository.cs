@@ -94,13 +94,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarCliente();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateCliente(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving Cliente entity.");
@@ -141,12 +141,12 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarCliente();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateCliente(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
+                    result.Message = validationResult.Message;
                     return result;
                 }
 

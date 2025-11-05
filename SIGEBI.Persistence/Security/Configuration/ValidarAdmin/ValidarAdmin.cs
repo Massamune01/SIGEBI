@@ -1,54 +1,107 @@
 ﻿using FluentValidation;
+using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Persistence.Security.Configuration.ValidarAdmin
 {
-    public class ValidarAdmin : AbstractValidator<Admin>
+    public class ValidarAdmin
     {
-        public ValidarAdmin()
+        public OperationResult ValidateAdmin(Admin admin)
         {
-            // Objeto no nulo
-            RuleFor(a => a).NotNull().WithMessage("El objeto Admin no puede ser nulo.");
+            OperationResult result = new OperationResult();
 
-            // Nombre: obligatorio, max 60
-            RuleFor(a => a.Nombre)
-                .NotEmpty().WithMessage("El nombre es obligatorio.")
-                .MaximumLength(60).WithMessage("El nombre no puede exceder 60 caracteres.");
+            // --- Validación de objeto ---
+            if (admin == null)
+            { 
+                result.Success = false;
+                result.Message = "El objeto Admin no puede ser nulo.";
+                return result; 
+            }
 
-            // Apellido: opcional, max 80
-            RuleFor(a => a.Apellido)
-                .MaximumLength(80).WithMessage("El apellido no puede exceder 80 caracteres.")
-                .When(a => !string.IsNullOrWhiteSpace(a.Apellido));
+            // --- Nombre: obligatorio, máximo 60 caracteres ---
+            if (string.IsNullOrWhiteSpace(admin.Nombre))
+            { 
+                result.Success = false;
+                result.Message = "El nombre es obligatorio.";
+                return result; 
+            }
+            if (admin.Nombre.Length > 60)
+            { 
+                result.Success = false;
+                result.Message = "El nombre no puede exceder el limite de caracteres.";
+                return result; 
+            }
 
-            // Género: obligatorio y dominio válido
-            RuleFor(a => a.Genero)
-                .NotEmpty().WithMessage("El género es obligatorio.");
+            // --- Apellido: opcional, máximo 80 caracteres ---
+            if (!string.IsNullOrWhiteSpace(admin.Apellido) && admin.Apellido.Length > 80)
+            { 
+                result.Success = false;
+                result.Message = "El apellido no puede exceder el limite de caracteres.";
+                return result; 
+            }
 
-            // Email: obligatorio, formato válido y max 80
-            RuleFor(a => a.Email)
-                .NotEmpty().WithMessage("El email es obligatorio.")
-                .EmailAddress().WithMessage("El email no tiene un formato válido.")
-                .MaximumLength(80).WithMessage("El email no puede exceder 80 caracteres.");
+            // --- Email: obligatorio, formato y longitud ---
+            if (string.IsNullOrWhiteSpace(admin.Email))
+            { 
+                result.Success = false;
+                result.Message = "El email es obligatorio.";
+                return result; 
+            }
+            if (!(admin.Email.EndsWith("@gmail.com") || admin.Email.EndsWith("@hotmail.com")))
+            { 
+                result.Success = false;
+                result.Message = "El email no tiene un formato válido.";
+                return result; 
+            }
+            if (admin.Email.Length > 80)
+            { 
+                result.Success = false;
+                result.Message = "El email no puede exceder el limite de caracteres.";
+                return result; 
+            }
 
-            // Nacimiento: obligatorio, no futuro, edad razonable
-            RuleFor(a => a.Nacimiento)
-                .NotEmpty().WithMessage("La fecha de nacimiento es obligatoria.");
-            // Edad: opcional, >=0 y <=150
-            RuleFor(a => a.Edad)
-                .GreaterThanOrEqualTo(0).WithMessage("La edad no puede ser negativa.");
+            // --- Nacimiento: obligatorio, no futuro ---
+            if (admin.Nacimiento == default)
+            {
+                result.Success = false;
+                result.Message = "La fecha de nacimiento es obligatoria.";
+                return result;
+            }
 
-            // StatusAdmin: obligatorio y dominio válido
-            RuleFor(a => a.AdminEstatus)
-                .NotEmpty().WithMessage("El estado del admin es obligatorio.");
+            var hoy = DateOnly.FromDateTime(DateTime.Now);
+            if (admin.Nacimiento > hoy)
+            { 
+                result.Success = false;
+                result.Message = "La fecha de nacimiento no puede ser futura.";
+                return result; 
+            }
 
-            // RolAdmin: opcional, si se especifica debe ser > 0
-            RuleFor(a => a.RolId)
-                .GreaterThan(0).WithMessage("RolAdmin, si se especifica, debe ser un id válido (> 0).");
+            // --- Edad: opcional, pero si existe debe ser >= 0 y <= 150 ---
+            if (admin.Edad < 0)
+            { 
+                result.Success = false;
+                result.Message = "La edad no puede ser negativa.";
+                return result; 
+            }
+            if (admin.Edad >= 150)
+            { 
+                result.Success = false;
+                result.Message = "La edad no puede ser mayor de 150 años.";
+                return result; 
+            }
 
-            // IdLgOpAdmin: opcional, si se especifica debe ser >= 0
-            RuleFor(a => a.IdLgOpAdmin)
-                .GreaterThanOrEqualTo(0).WithMessage("IdLgOpAdmin debe ser mayor o igual a 0 si se especifica.")
-                .When(a => a.IdLgOpAdmin.HasValue);
+            // --- AdminEstatus: obligatorio y válido ---
+            if (!Enum.IsDefined(typeof(Status), admin.AdminEstatus))
+            { 
+                result.Success = false;
+                result.Message = "El estado del admin no es válido.";
+                return result; 
+            }
+
+            result.Success = true;
+            result.Message = "Validación exitosa.";
+            return result;
         }
     }
 }

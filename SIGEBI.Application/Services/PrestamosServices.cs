@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;

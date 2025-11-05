@@ -29,35 +29,6 @@ namespace SIGEBI.Application.Validators.Configuration.PrestamosValidators
                 {
                     validationResult.AddError("DatePrest is required.");
                 }
-                //Check ISBN max 13 digit and min 13 digit
-                if (entity.IdLibros.ToString().Length != 13)
-                {
-                    validationResult.AddError("IdLibros must be exactly 13 digits long.");
-                }
-                // Check for required fields
-                if (entity.DateDevol == default)
-                {
-                    validationResult.AddError("DateDevol is required.");
-                }
-                // Check for positive integers
-                if (entity.IdLibros <= 0)
-                {
-                    validationResult.AddError("IdLibros must be a positive integer.");
-                }
-                if (entity.IdCliente <= 0)
-                {
-                    validationResult.AddError("IdCliente must be a positive integer.");
-                }
-                if (entity.IdLgOpLibro <= 0)
-                {
-                    validationResult.AddError("IdLgOpLibro must be a positive integer.");
-                }
-
-                // Check that DateDevol is after DatePrest
-                if (entity.DateDevol <= entity.DatePrest)
-                {
-                    validationResult.AddError("DateDevol must be after DatePrest.");
-                }
 
                 // Check if the book is available for loan
                 var prestamosExistentes = await _prestamosRepository.GetLibroForPrestamoAsync(entity.IdLibros);

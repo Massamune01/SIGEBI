@@ -22,6 +22,9 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         {
             _logger = logger;
         }
+        public AdminRepository(SIGEBIContext context) : base(context)
+        {
+        }
 
         public async Task<List<Admin>> GetAdminByIdAsync(int id)
         {
@@ -127,13 +130,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarAdmin();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateAdmin(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving Admin entity.");
@@ -174,14 +177,15 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             var result = new OperationResult();
             try
             {
+
                 var validator = new ValidarAdmin();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateAdmin(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("The validation is not valid.");
+                    result.Message = validationResult.Message;
                     return result;
                 }
 

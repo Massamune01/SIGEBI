@@ -1,64 +1,132 @@
 ﻿using FluentValidation;
+using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
+using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Persistence.Security.Configuration.ValidarCliente
 {
-    public class ValidarCliente : AbstractValidator<Cliente>
+    public class ValidarCliente
     {
-        public ValidarCliente()
+        public OperationResult ValidateCliente(Cliente cliente)
         {
-            // OBJETO
-            RuleFor(c => c).NotNull().WithMessage("El objeto Cliente no puede ser nulo.");
+            var result = new OperationResult();
 
-            // NOMBRE (heredado de Usuario)
-            RuleFor(c => c.Nombre)
-                .NotEmpty().WithMessage("El nombre es obligatorio.")
-                .MaximumLength(100).WithMessage("El nombre no puede exceder 100 caracteres.");
+            // Validación de objeto nulo
+            if (cliente == null)
+            {
+                result.Success = false;
+                result.Message = "El objeto Cliente no puede ser nulo.";
+                return result;
+            }
 
-            // APELLIDO (heredado de Usuario) - opcional
-            RuleFor(c => c.Apellido)
-                .MaximumLength(80).WithMessage("El apellido no puede exceder 80 caracteres.")
-                .When(c => !string.IsNullOrWhiteSpace(c.Apellido));
+            // Nombre
+            if (string.IsNullOrWhiteSpace(cliente.Nombre))
+            {
+                result.Success = false;
+                result.Message = "El nombre es obligatorio.";
+                return result;
+            }
 
-            // GENERO (heredado de Usuario) - puede ser string o enum en tu modelo
-            RuleFor(c => c.Genero)
-                .NotEmpty().WithMessage("El género es obligatorio.");
+            if (cliente.Nombre.Length > 100)
+            {
+                result.Success = false;
+                result.Message = "El nombre no puede exceder 100 caracteres.";
+                return result;
+            }
 
-            // EMAIL (heredado de Usuario)
-            RuleFor(c => c.Email)
-                .NotEmpty().WithMessage("El email es obligatorio.")
-                .EmailAddress().WithMessage("El email no tiene un formato válido.")
-                .MaximumLength(80).WithMessage("El email no puede exceder 80 caracteres.");
+            // Apellido (opcional, solo si tiene valor)
+            if (!string.IsNullOrWhiteSpace(cliente.Apellido) && cliente.Apellido.Length > 80)
+            {
+                result.Success = false;
+                result.Message = "El apellido no puede exceder 80 caracteres.";
+                return result;
+            }
 
-            // NACIMIENTO (heredado de Usuario)
-            RuleFor(c => c.Nacimiento)
-                .NotEmpty().WithMessage("La fecha de nacimiento es obligatoria.");
+            // Email
+            if (string.IsNullOrWhiteSpace(cliente.Email))
+            {
+                result.Success = false;
+                result.Message = "El email es obligatorio.";
+                return result;
+            }
 
-            // TOTALS: no negativos
-            RuleFor(c => c.TotalDevoluciones)
-                .GreaterThanOrEqualTo(0).WithMessage("TotalDevoluciones debe ser mayor o igual a 0.");
+            if (!cliente.Email.Contains("@") || !cliente.Email.Contains("."))
+            {
+                result.Success = false;
+                result.Message = "El email no tiene un formato válido.";
+                return result;
+            }
 
-            RuleFor(c => c.CapacidadPrest)
-                .GreaterThanOrEqualTo(0).WithMessage("CapacidadPrest debe ser mayor o igual a 0.");
+            if (cliente.Email.Length > 80)
+            {
+                result.Success = false;
+                result.Message = "El email no puede exceder 80 caracteres.";
+                return result;
+            }
 
-            RuleFor(c => c.TotalDevolRestrasadas) // nota: usa el nombre según tu clase (has typo en tu modelo)
-                .GreaterThanOrEqualTo(0).WithMessage("TotalDevolRestrasadas debe ser mayor o igual a 0.");
+            // Nacimiento
+            if (cliente.Nacimiento == null)
+            {
+                result.Success = false;
+                result.Message = "La fecha de nacimiento es obligatoria.";
+                return result;
+            }
 
-            RuleFor(c => c.TotalPrestamos)
-                .GreaterThanOrEqualTo(0).WithMessage("TotalPrestamos debe ser mayor o igual a 0.");
+            // Totales no negativos
+            if (cliente.TotalDevoluciones < 0)
+            {
+                result.Success = false;
+                result.Message = "TotalDevoluciones debe ser mayor o igual a 0.";
+                return result;
+            }
 
-            RuleFor(c => c.PrestamosActivos)
-                .GreaterThanOrEqualTo(0).WithMessage("PrestamosActivos debe ser mayor o igual a 0.");
+            if (cliente.CapacidadPrest < 0)
+            {
+                result.Success = false;
+                result.Message = "CapacidadPrest debe ser mayor o igual a 0.";
+                return result;
+            }
 
-            // Consistencia: PrestamosActivos no puede exceder la capacidad
-            RuleFor(c => c)
-                .Must(c => c.CapacidadPrest == 0 || c.PrestamosActivos <= c.CapacidadPrest)
-                .WithMessage("PrestamosActivos no puede ser mayor que la CapacidadPrest del cliente.");
+            if (cliente.TotalDevolRestrasadas < 0)
+            {
+                result.Success = false;
+                result.Message = "TotalDevolRestrasadas debe ser mayor o igual a 0.";
+                return result;
+            }
 
-            // StatusCliente (es enum Status en tu clase): debe ser un valor definido
-            RuleFor(c => c.StatusCliente)
-                .IsInEnum().WithMessage("El StatusCliente no es un valor válido.");
+            if (cliente.TotalPrestamos < 0)
+            {
+                result.Success = false;
+                result.Message = "TotalPrestamos debe ser mayor o igual a 0.";
+                return result;
+            }
 
+            if (cliente.PrestamosActivos < 0)
+            {
+                result.Success = false;
+                result.Message = "PrestamosActivos debe ser mayor o igual a 0.";
+                return result;
+            }
+
+            // Consistencia: PrestamosActivos <= CapacidadPrest
+            if (cliente.CapacidadPrest > 0 && cliente.PrestamosActivos > cliente.CapacidadPrest)
+            {
+                result.Success = false;
+                result.Message = "PrestamosActivos no puede ser mayor que la CapacidadPrest del cliente.";
+                return result;
+            }
+
+            // StatusCliente (Enum)
+            if (!Enum.IsDefined(typeof(Status), cliente.StatusCliente))
+            {
+                result.Success = false;
+                result.Message = "El StatusCliente no es un valor válido.";
+                return result;
+            }
+
+            // Si pasa todas las validaciones
+            result.Success = true;
+            return result;
         }
     }
 }

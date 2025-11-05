@@ -71,13 +71,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarLibro();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateLibro(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving Libro entity with ISBN: {ISBN}", entity.ISBN);
@@ -144,12 +144,12 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarLibro();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidateLibro(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    result.Message = validationResult.Message;
                     return result;
                 }
 

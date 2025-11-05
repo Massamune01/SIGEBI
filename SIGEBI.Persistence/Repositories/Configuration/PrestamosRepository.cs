@@ -22,7 +22,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         }
 
         // Get Libro by IdLibro to check availability by column cantidad
-        public async Task<OperationResult> GetLibroForPrestamoAsync(int IdLibro)
+        public async Task<OperationResult> GetLibroForPrestamoAsync(Int64 IdLibro)
         {
             var result = new OperationResult();
             try
@@ -37,6 +37,14 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                     _logger.LogWarning("Libro with Id {IdLibro} not found", IdLibro);
                     return result;
                 }
+                else if(libro.ISBN <= 0)
+                {
+                    result.Success = false;
+                    result.Message = "Libro with Id 0 or low cannot be find";
+                    _logger.LogWarning("Libro with Id {IdLibro} not found", IdLibro);
+                    return result;
+                }
+
                 if (libro.cantidad <= 0)
                 {
                     result.Success = false;
@@ -80,13 +88,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarPrestamos();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidatePrestamo(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
                     result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
-                    return result; // Se detiene si no es válido
+                    result.Message = validationResult.Message;
+                    return result;
                 }
 
                 _logger.LogInformation("Saving Prestamo for a client");
@@ -144,12 +152,12 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 var validator = new ValidarPrestamos();
 
-                var validationResult = await validator.ValidateAsync(entity);
+                var validationResult = validator.ValidatePrestamo(entity);
 
-                if (!validationResult.IsValid)
+                if (!validationResult.Success)
                 {
-                    result.Success = false;
-                    result.Message = string.Join("; ", validationResult.Errors.Select(e => e.ErrorMessage));
+                    result.Success = false; 
+                    result.Message = validationResult.Message;
                     return result;
                 }
 
