@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
@@ -22,6 +23,7 @@ namespace SIGEBI.Persistence.Context
         public DbSet<Bibliotecarios> Bibliotecarios { get; set; }
         public DbSet<Prestamos> Prestamos { get; set; }
         public DbSet<Admin> Admin { get; set; }
+        public DbSet<AdminDto> AdminDto { get; set; }
         public DbSet<Credenciales> Credenciales { get; set; }
         public DbSet<LogOperations> LogOperations { get; set; }
 

@@ -1,25 +1,25 @@
-
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Domain.Interfaces.Cache;
+using SIGEBI.Infraestructure.Cache;
 using SIGEBI.Infraestructure.Data.Configuration;
-using SIGEBI.Persistence.Context;
 using SIGEBI.Infraestructure.Dependencies.Admin;
 using SIGEBI.Infraestructure.Dependencies.Bibliotecario;
 using SIGEBI.Infraestructure.Dependencies.Cliente;
+using SIGEBI.Infraestructure.Dependencies.Credenciales;
 using SIGEBI.Infraestructure.Dependencies.Libro;
 using SIGEBI.Infraestructure.Dependencies.LogOperation;
 using SIGEBI.Infraestructure.Dependencies.Prestamo;
 using SIGEBI.Infraestructure.Dependencies.Roles;
-using SIGEBI.Infraestructure.Dependencies.Credenciales;
-using SIGEBI.Domain.Interfaces.Cache;
-using SIGEBI.Infraestructure.Cache;
+using SIGEBI.Persistence.Context;
 
-namespace SIGEBI.API1
+namespace SIGEBI.Web
 {
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
 
             //Var Connection String
             var connectionString = builder.Configuration.GetConnectionString("SIGEBI_BD");
@@ -29,7 +29,7 @@ namespace SIGEBI.API1
             builder.Services.AddDbContext<SIGEBIContext>(options => options.UseSqlServer(connectionString));
 
             // Add Dependency injection for CacheService
-            builder.Services.AddSingleton<ICacheService,  CacheLRUService>();
+            builder.Services.AddSingleton<ICacheService, CacheLRUService>();
 
             //Adding Services Dependencies
             // Add dependency injection for Ef repositories
@@ -50,25 +50,30 @@ namespace SIGEBI.API1
             //Credenciales Dependency Injection
             builder.Services.AddCredencialesDependency();
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            // Add services to the container.
+            builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (!app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseExceptionHandler("/Home/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
+            app.UseRouting();
 
             app.UseAuthorization();
 
-            app.MapControllers();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
         }
