@@ -48,7 +48,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                         Id = reader.GetInt32(reader.GetOrdinal("Id")),
                         Rol = reader.GetString(reader.GetOrdinal("Rol")),
                         RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("StatusRol")),
-                        IdLgOpLibro = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
+                        IdLgOpRol = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
                             ? null
                             : reader.GetInt32(reader.GetOrdinal("IdLgOpRol"))
                     }
@@ -99,7 +99,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                         Id = reader.GetInt32(reader.GetOrdinal("Id")),
                         Rol = reader.GetString(reader.GetOrdinal("Rol")),
                         RolEstatus = (Domain.Enums.Status)reader.GetInt32(reader.GetOrdinal("StatusRol")),
-                        IdLgOpLibro = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
+                        IdLgOpRol = reader.IsDBNull(reader.GetOrdinal("IdLgOpRol"))
                             ? null
                             : reader.GetInt32(reader.GetOrdinal("IdLgOpRol"))
                     },parameters
@@ -113,7 +113,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 {
                     result.Success = true;
                     result.Message = "Rol obtenido correctamente.";
-                    result.Data = rol;
+                    result.Data = rol.FirstOrDefault();
                 }
             }
             catch (Exception ex)

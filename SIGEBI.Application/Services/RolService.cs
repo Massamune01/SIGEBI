@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
@@ -64,7 +63,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = existingRol;
                 result.Message = "Role created successfully.";
-                _cacheService.ClearKeys();
+                //_cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -158,7 +157,7 @@ namespace SIGEBI.Application.Services
                 Roles rol = new Roles()
                 {
                     Id = updateRolDto.Id,
-                    Rol = updateRolDto.Nombre
+                    Rol = updateRolDto.Rol
                 };
                 var updateResult = await _rolRepository.Update(rol);
                 if (!updateResult.Success)
@@ -190,13 +189,13 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_Roles";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<RolDto> list))
+            /*if (_cacheService.TryGet(cacheKey, out List<RolDto> list))
             {
                 result.Success = true;
                 result.Data = list;
                 result.Message = "Roles retrieved from cache.";
                 return result;
-            }
+            }*/
 
             try
             {
@@ -211,7 +210,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = oResultGetAll.Data;
                 result.Message = oResultGetAll.Message;
-                _cacheService.Set(cacheKey, oResultGetAll.Data);
+                //_cacheService.Set(cacheKey, oResultGetAll.Data);
                 return result;
 
             }

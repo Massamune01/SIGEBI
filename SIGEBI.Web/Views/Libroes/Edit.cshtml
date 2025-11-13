@@ -1,0 +1,76 @@
+﻿@model SIGEBI.Domain.Entities.Configuration.Libro
+@using SIGEBI.Domain.Enums
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Libro</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ISBN" />
+            <div class="form-group">
+                <label asp-for="titulo" class="control-label"></label>
+                <input asp-for="titulo" class="form-control" />
+                <span asp-validation-for="titulo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="autor" class="control-label"></label>
+                <input asp-for="autor" class="form-control" />
+                <span asp-validation-for="autor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="editorial" class="control-label"></label>
+                <input asp-for="editorial" class="form-control" />
+                <span asp-validation-for="editorial" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="anoPublicacion" class="control-label"></label>
+                <input asp-for="anoPublicacion" class="form-control" />
+                <span asp-validation-for="anoPublicacion" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="categoria" class="control-label"></label>
+                <input asp-for="categoria" class="form-control" />
+                <span asp-validation-for="categoria" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="numPaginas" class="control-label"></label>
+                <input asp-for="numPaginas" class="form-control" />
+                <span asp-validation-for="numPaginas" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="cantidad" class="control-label"></label>
+                <input asp-for="cantidad" class="form-control" />
+                <span asp-validation-for="cantidad" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<Status>()">
+                    <option value="">-- Seleccione un Estatus --</option>>>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IdLgOpLibro" class="control-label"></label>
+                <input asp-for="IdLgOpLibro" class="form-control" />
+                <span asp-validation-for="IdLgOpLibro" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

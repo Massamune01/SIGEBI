@@ -31,7 +31,7 @@ namespace SIGEBI.Application.Validators.Configuration.RolValidators
             try
             {
                 // Verificar si ya existe un rol con el mismo nombre
-                var existingRoles = await _rolRepository.GetRolByName(entity.Nombre);
+                var existingRoles = await _rolRepository.GetRolByName(entity.Rol);
                 if (existingRoles != null && existingRoles.Any())
                 {
                     validationresult.Errors.Add("A role with the same name already exists.");

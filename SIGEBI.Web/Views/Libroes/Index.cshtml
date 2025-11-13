@@ -1,0 +1,88 @@
+﻿@model IEnumerable<SIGEBI.Domain.Entities.Configuration.Libro>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                ISBN
+            </th>
+            <th>
+                Titulo
+            </th>
+            <th>
+                Autor
+            </th>
+            <th>
+                Editorial
+            </th>
+            <th>
+				Año Publicacion
+            </th>
+            <th>
+                Categoria
+            </th>
+            <th>
+                num.Paginas
+            </th>
+            <th>
+                Cantidad
+            </th>
+            <th>
+                Status
+            </th>
+            <th>
+                IdLgOpLibro
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ISBN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.titulo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.autor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.editorial)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.anoPublicacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.categoria)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.numPaginas)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.cantidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdLgOpLibro)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ISBN">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ISBN">Details</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
