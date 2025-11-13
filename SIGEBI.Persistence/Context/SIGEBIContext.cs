@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
@@ -27,6 +28,7 @@ namespace SIGEBI.Persistence.Context
         public DbSet<AdminDto> AdminDto { get; set; }
         public DbSet<Credenciales> Credenciales { get; set; }
         public DbSet<CredencialesGetModel> CredencialesGetModel { get; set; }
+        public DbSet<CredencialesCreateDto> CredencialesCreateDto { get; set; }
         public DbSet<LogOperations> LogOperations { get; set; }
 
         #endregion

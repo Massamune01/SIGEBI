@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
@@ -54,10 +55,18 @@ namespace SIGEBI.Web.Controllers
         // POST: CredencialesAdmController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create(CredencialesCreateDto credencialesCreateDto)
         {
             try
             {
+                ServiceResult result = await _credencialesService.CreateCredenciales(credencialesCreateDto);
+
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -67,39 +76,36 @@ namespace SIGEBI.Web.Controllers
         }
 
         // GET: CredencialesAdmController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<ActionResult> Edit(int id)
         {
-            return View();
+            ServiceResult result = await _credencialesService.GetCredencialesById(id);
+
+            CredencialesGetModel credencial = result.Data;
+
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            return View(credencial);
         }
 
         // POST: CredencialesAdmController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(CredencialesUpdateDto credencialesUpdateDto)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                ServiceResult result = await _credencialesService.UpdateCredenciales(credencialesUpdateDto);
 
-        // GET: CredencialesAdmController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
 
-        // POST: CredencialesAdmController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch
