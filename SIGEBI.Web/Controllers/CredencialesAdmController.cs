@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Interfaces;
+using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -29,10 +30,19 @@ namespace SIGEBI.Web.Controllers
         }
 
         // GET: CredencialesAdmController/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
+            ServiceResult result = await _credencialesService.GetCredencialesById(id);
 
-            return View();
+            CredencialesGetModel credencial = result.Data;
+
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            return View(credencial);
         }
 
         // GET: CredencialesAdmController/Create

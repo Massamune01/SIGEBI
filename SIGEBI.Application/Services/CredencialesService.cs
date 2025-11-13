@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
@@ -79,13 +78,13 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_Credenciales";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<CredencialesDto> list))
+            /*if (_cacheService.TryGet(cacheKey, out CredencialesGetModel list))
             {
                 result.Success = true;
                 result.Data = list;
                 result.Message = "Credenciales retrieved from cache.";
                 return result;
-            }
+            }*/
             try
             {
                 _logger.LogInformation("Retrieving all credentials.");
@@ -121,7 +120,7 @@ namespace SIGEBI.Application.Services
                 {
                     result.Success = true;
                     result.Message = "Retrieving Credenciales Succesfully.";
-                    result.Data = oCredenciales;
+                    result.Data = oCredenciales.Data;
                 }
             }
             catch (Exception ex) 

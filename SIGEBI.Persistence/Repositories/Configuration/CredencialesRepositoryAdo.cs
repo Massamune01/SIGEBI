@@ -165,7 +165,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 if (credential != null)
                 {
                     operationResult.Success = true;
-                    operationResult.Data = credential;
+                    operationResult.Data = credential.FirstOrDefault();
                     operationResult.Message = "Credencial obtenida correctamente.";
                     return operationResult;
                 }
