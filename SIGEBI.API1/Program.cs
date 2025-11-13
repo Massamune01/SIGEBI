@@ -22,7 +22,7 @@ namespace SIGEBI.API1
             var builder = WebApplication.CreateBuilder(args);
 
             //Var Connection String
-            var connectionString = builder.Configuration.GetConnectionString("SIGEBI_BD");
+            var connectionString = builder.Configuration.GetConnectionString("SIGEBI");
             //Adding HelperDb as Singleton
             builder.Services.AddSingleton(new HelperDb(connectionString));
 

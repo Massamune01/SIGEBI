@@ -8,6 +8,7 @@ using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
+using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
 namespace SIGEBI.Persistence.Context
 {
@@ -25,6 +26,7 @@ namespace SIGEBI.Persistence.Context
         public DbSet<Admin> Admin { get; set; }
         public DbSet<AdminDto> AdminDto { get; set; }
         public DbSet<Credenciales> Credenciales { get; set; }
+        public DbSet<CredencialesGetModel> CredencialesGetModel { get; set; }
         public DbSet<LogOperations> LogOperations { get; set; }
 
         #endregion

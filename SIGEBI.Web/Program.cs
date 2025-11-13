@@ -22,7 +22,7 @@ namespace SIGEBI.Web
 
 
             //Var Connection String
-            var connectionString = builder.Configuration.GetConnectionString("SIGEBI_BD");
+            var connectionString = builder.Configuration.GetConnectionString("SIGEBI");
             //Adding HelperDb as Singleton
             builder.Services.AddSingleton(new HelperDb(connectionString));
 
@@ -49,7 +49,6 @@ namespace SIGEBI.Web
             builder.Services.AddRolAdoDependency();
             //Credenciales Dependency Injection
             builder.Services.AddCredencialesDependency();
-
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

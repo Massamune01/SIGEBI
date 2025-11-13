@@ -97,7 +97,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
                 result.Success = true;
-                result.Data = oCredencialesList;
+                result.Data = oCredencialesList.Data;
                 result.Message = "Credenciales retrieved successfully.";
                 _cacheService.Set(cacheKey, result.Data);
             }

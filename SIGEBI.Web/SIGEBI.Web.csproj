@@ -20,8 +20,4 @@
     <ProjectReference Include="..\SIGEBI.Persistence\SIGEBI.Persistence.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\AdminView\" />
-  </ItemGroup>
-
 </Project>
