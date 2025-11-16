@@ -10,8 +10,6 @@ using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
-using SIGEBI.Persistence.Models.Configuration.Credenciales;
-using SIGEBI.Persistence.Models.Configuration.Rol;
 
 namespace SIGEBI.Persistence.Context
 {

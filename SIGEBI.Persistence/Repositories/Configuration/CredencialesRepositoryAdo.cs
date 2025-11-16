@@ -2,12 +2,12 @@
 using System.Linq.Expressions;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Repository;
 using SIGEBI.Infraestructure.Data.Configuration;
-using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
 namespace SIGEBI.Persistence.Repositories.Configuration
 {

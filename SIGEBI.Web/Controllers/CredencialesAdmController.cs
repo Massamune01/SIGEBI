@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Persistence.Models.Configuration.Credenciales;
 
 namespace SIGEBI.Web.Controllers
 {

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Infraestructure.Data.Configuration;
-using SIGEBI.Persistence.Models.Configuration.Rol;
 using SIGEBI.Persistence.Security.Configuration.ValidarLibro;
 using SIGEBI.Persistence.Security.Configuration.ValidarRol;
 

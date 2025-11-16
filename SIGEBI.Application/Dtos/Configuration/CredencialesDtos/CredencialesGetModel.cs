@@ -1,4 +1,4 @@
-﻿namespace SIGEBI.Persistence.Models.Configuration.Credenciales
+﻿namespace SIGEBI.Application.Dtos.Configuration.CredencialesDtos
 {
     public record CredencialesGetModel
     {

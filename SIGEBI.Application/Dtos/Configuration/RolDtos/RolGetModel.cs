@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SIGEBI.Domain.Enums;
 
-namespace SIGEBI.Persistence.Models.Configuration.Rol
+namespace SIGEBI.Application.Dtos.Configuration.RolDtos
 {
     public record RolGetModel
     {
