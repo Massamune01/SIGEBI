@@ -14,18 +14,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly IClienteRepository _clienteRepository;
         private readonly ILogger<ClienteService> _logger;
-        private readonly IValidatorBase<ClienteCreateDto> _createValidator;
-        private readonly IValidatorBase<ClienteUpdateDto> _updateValidator;
+        private readonly IValidatorBase<ClienteDto> _Validator;
         private readonly ICacheService _cacheService;
 
         public ClienteService(IClienteRepository clienteRepository, ILogger<ClienteService> logger, 
-            IValidatorBase<ClienteCreateDto> createValidator, IValidatorBase<ClienteUpdateDto> updateValidator
-            , ICacheService cacheService)
+            IValidatorBase<ClienteDto> validator, ICacheService cacheService)
         {
             _clienteRepository = clienteRepository;
             _logger = logger;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -35,7 +32,26 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var createValidation = await _createValidator.ValidateCreate(clienteCreateDto);
+                _logger.LogInformation("Validating Cliente");
+
+                ClienteDto clienteDto = new ClienteDto()
+                {
+                    Nombre = clienteCreateDto.Nombre,
+                    Apellido = clienteCreateDto.Apellido,
+                    Edad = clienteCreateDto.Edad,
+                    Genero = clienteCreateDto.Genero,
+                    Email = clienteCreateDto.Email,
+                    Nacimiento = clienteCreateDto.Nacimiento,
+                    RolId = clienteCreateDto.RolId,
+                    CapacidadPrest = clienteCreateDto.CapacidadPrest ?? 0,
+                    StatusCliente = clienteCreateDto.StatusCliente,
+                    TotalDevoluciones = clienteCreateDto.TotalDevoluciones ?? 0,
+                    TotalDevolRestrasadas = clienteCreateDto.TotalDevolRestrasadas ?? 0,
+                    TotalPrestamos = clienteCreateDto.TotalPrestamos ?? 0,
+                    PrestamosActivos = clienteCreateDto.PrestamosActivos ?? 0,
+                };
+
+                var createValidation = await _Validator.Validate(clienteDto,1);
                 if (!createValidation.IsValid)
                 {
                     result.Success = false;
@@ -174,7 +190,6 @@ namespace SIGEBI.Application.Services
                 return result;
             }
         }
-
         public async Task<ServiceResult> GetClienteByIdAsync(int id)
         {
             ServiceResult result = new ServiceResult();
@@ -210,7 +225,26 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var updateValidation = await _updateValidator.ValidateUpdate(clienteUpdateDto);
+                _logger.LogInformation("Validating Cliente");
+
+                ClienteDto clienteDto = new ClienteDto()
+                {
+                    Nombre = clienteUpdateDto.Nombre,
+                    Apellido = clienteUpdateDto.Apellido,
+                    Edad = clienteUpdateDto.Edad,
+                    Genero = clienteUpdateDto.Genero,
+                    Email = clienteUpdateDto.Email,
+                    Nacimiento = clienteUpdateDto.Nacimiento,
+                    RolId = clienteUpdateDto.RolId,
+                    CapacidadPrest = clienteUpdateDto.CapacidadPrest,
+                    StatusCliente = clienteUpdateDto.StatusCliente,
+                    TotalDevoluciones = clienteUpdateDto.TotalDevoluciones,
+                    TotalDevolRestrasadas = clienteUpdateDto.TotalDevolRestrasadas,
+                    TotalPrestamos = clienteUpdateDto.TotalPrestamos,
+                    PrestamosActivos = clienteUpdateDto.PrestamosActivos,
+                };
+
+                var updateValidation = await _Validator.Validate(clienteDto,2);
                 if (!updateValidation.IsValid)
                 {
                     result.Success = false;

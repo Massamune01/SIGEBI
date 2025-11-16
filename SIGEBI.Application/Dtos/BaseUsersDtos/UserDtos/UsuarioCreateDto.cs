@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
@@ -24,11 +21,7 @@ namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
         public string? Email { get; set; }
 
         public DateOnly? Nacimiento { get; set; }
-
-        [Required]
         public int RolId { get; set; }
-
-        public int? IdLgOpLibro { get; set; }
     }
 
 }

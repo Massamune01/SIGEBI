@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Cliente
         public static void AddClienteDependency(this IServiceCollection Services)
         {
             Services.AddScoped<IClienteRepository, ClienteRepository>();
-            Services.AddScoped<IValidatorBase<ClienteCreateDto>, ClienteCreateValidator>();
-            Services.AddScoped<IValidatorBase<ClienteUpdateDto>, ClienteUpdateValidator>();
+            Services.AddScoped<IValidatorBase<ClienteDto>, ClienteValidator>();
             Services.AddTransient<IClienteService, ClienteService>();
         }
     }

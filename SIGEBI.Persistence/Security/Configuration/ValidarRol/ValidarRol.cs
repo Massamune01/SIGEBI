@@ -7,6 +7,7 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarRol
     {
         public ValidarRol()
         {
+
             // Objeto no nulo
             RuleFor(r => r).NotNull().WithMessage("El objeto Rol no puede ser nulo.");
 

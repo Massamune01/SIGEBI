@@ -16,5 +16,7 @@ namespace SIGEBI.Domain.Entities.Configuration.Prestamos
         public Int64 IdLibros { get; set; }
         public int IdCliente { get; set; }
         public int? IdLgOpPrest { get; set; }
+
+
     }
 }

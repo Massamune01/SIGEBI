@@ -13,18 +13,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly IPrestamosRepository _prestamosRepository;
         private readonly ILogger<PrestamosServices> _logger;
-        private readonly IValidatorBase<PrestamoCreateDto> _createValidator;
-        private readonly IValidatorBase<PrestamoUpdateDto> _updateValidator;
+        private readonly IValidatorBase<PrestamoDto> _Validator;
         private readonly ICacheService _cacheService;
 
         public PrestamosServices(IPrestamosRepository prestamosRepository, ILogger<PrestamosServices> logger, 
-            IValidatorBase<PrestamoCreateDto> createValidator, IValidatorBase<PrestamoUpdateDto> updateValidator
-            , ICacheService cacheService)
+            IValidatorBase<PrestamoDto> validator, ICacheService cacheService)
         {
             _prestamosRepository = prestamosRepository;
             _logger = logger;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -34,7 +31,17 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business Validation logic to create a loan
-                var prestamoValidation = await _createValidator.ValidateCreate(prestamoCreateDto);
+                _logger.LogInformation("Validating LogOperations");
+                PrestamoDto prestamoDto = new PrestamoDto()
+                {
+                    DatePrest = prestamoCreateDto.DatePrest,
+                    DateDevol = prestamoCreateDto.DateDevol,
+                    IdLibros = prestamoCreateDto.IdLibros,
+                    IdCliente = prestamoCreateDto.IdCliente,
+                    IdLgOpPrest = prestamoCreateDto.IdLgOpLibro
+                };
+
+                var prestamoValidation = await _Validator.Validate(prestamoDto,1);
                 
                 if (!prestamoValidation.IsValid)
                 {
@@ -186,7 +193,14 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business Validation logic to create a loan
-                var prestamoValidation = await _updateValidator.ValidateUpdate(prestamoUpdateDto);
+                _logger.LogInformation("Validating LogOperations");
+                PrestamoDto prestamoDto = new PrestamoDto()
+                {
+                    Id = prestamoUpdateDto.Id,
+                    DateWasDevol = prestamoUpdateDto.DateWasDevol,
+                    Status = prestamoUpdateDto.PrestamosStatus
+                };
+                var prestamoValidation = await _Validator.Validate(prestamoDto,2);
 
                 if (!prestamoValidation.IsValid)
                 {

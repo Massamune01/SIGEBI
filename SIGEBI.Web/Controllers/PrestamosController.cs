@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
 using SIGEBI.Persistence.Context;
+using SIGEBI.Web.Models;
 
 namespace SIGEBI.Web.Controllers
 {
@@ -41,6 +43,13 @@ namespace SIGEBI.Web.Controllers
         // GET: Prestamos/Create
         public IActionResult Create()
         {
+
+            var libros = _context.Libro
+           .Select(l => new { l.ISBN, l.titulo })
+           .ToList();
+
+            ViewBag.Libros = libros;
+
             return View();
         }
 

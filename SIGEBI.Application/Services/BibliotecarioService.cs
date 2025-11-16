@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
@@ -14,18 +15,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly ILogger<BibliotecarioService> _logger;
         private readonly IBibliotecariosRepository _bibliotecariosRepository;
-        private readonly IValidatorBase<BibliotecarioCreateDto> _createValidator;
-        private readonly IValidatorBase<BibliotecarioUpdateDto> _updateValidator;
+        private readonly IValidatorBase<BibliotecarioDto> _Validator;
         private readonly ICacheService _cacheService;
 
         public BibliotecarioService(ILogger<BibliotecarioService> logger, IBibliotecariosRepository bibliotecariosRepository, 
-            IValidatorBase<BibliotecarioCreateDto> createvalidator, IValidatorBase<BibliotecarioUpdateDto> updatevalidator
-            , ICacheService cacheService)
+            IValidatorBase<BibliotecarioDto> validator, ICacheService cacheService)
         {
             _logger = logger;
             _bibliotecariosRepository = bibliotecariosRepository;
-            _updateValidator = updatevalidator;
-            _createValidator = createvalidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -35,7 +33,23 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Validaciones de negocio
-                var createvalidator = await _createValidator.ValidateCreate(bibliotecarioCreateDto);
+                _logger.LogInformation("Validating bibliotecario");
+                BibliotecarioDto bibliotecarioDto = new BibliotecarioDto()
+                {
+                    Nombre = bibliotecarioCreateDto.Nombre,
+                    Apellido = bibliotecarioCreateDto.Apellido,
+                    Edad = bibliotecarioCreateDto.Edad,
+                    Genero = bibliotecarioCreateDto.Genero,
+                    Email = bibliotecarioCreateDto.Email,
+                    Nacimiento = bibliotecarioCreateDto.Nacimiento,
+                    RolId = bibliotecarioCreateDto.RolId,
+                    TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
+                    TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
+                    TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
+                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
+                };
+
+                var createvalidator = await _Validator.Validate(bibliotecarioDto,1);
                 if (!createvalidator.IsValid)
                 {
                     result.Success = false;
@@ -204,7 +218,23 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Validaciones de negocio
-                var updatevalidator = await _updateValidator.ValidateUpdate(bibliotecarioUpdateDto);
+                _logger.LogInformation("Validating bibliotecario");
+                BibliotecarioDto bibliotecarioDto = new BibliotecarioDto()
+                {
+                    Nombre = bibliotecarioUpdateDto.Nombre,
+                    Apellido = bibliotecarioUpdateDto.Apellido,
+                    Edad = bibliotecarioUpdateDto.Edad,
+                    Genero = bibliotecarioUpdateDto.Genero,
+                    Email = bibliotecarioUpdateDto.Email,
+                    Nacimiento = bibliotecarioUpdateDto.Nacimiento,
+                    RolId = bibliotecarioUpdateDto.RolId,
+                    TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
+                    TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,
+                    TotalClientesAtendidos = bibliotecarioUpdateDto.TotalClientesAtendidos ?? 0,
+                    TotalPrestamos = bibliotecarioUpdateDto.TotalPrestamos ?? 0,
+                };
+
+                var updatevalidator = await _Validator.Validate(bibliotecarioDto,2);
                 if (!updatevalidator.IsValid)
                 {
                     result.Success = false;

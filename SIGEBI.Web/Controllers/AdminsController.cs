@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -13,10 +9,12 @@ namespace SIGEBI.Web.Controllers
     public class AdminsController : Controller
     {
         private readonly SIGEBIContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminsController(SIGEBIContext context)
+        public AdminsController(IAdminService adminService, SIGEBIContext context)
         {
             _context = context;
+            _adminService = adminService;
         }
 
         // GET: Admins

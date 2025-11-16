@@ -3,7 +3,7 @@ using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Application.Dtos.Configuration.LogOperationsDtos
 {
-    internal record LogOperationsDto
+    public record LogOperationsDto
     {
         [Key]
         public int IdOp { get; set; }

@@ -5,6 +5,7 @@ using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Services;
+using SIGEBI.Application.Validators.Base;
 using SIGEBI.Application.Validators.Configuration.PrestamosValidators;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Interfaces.Cache;
@@ -26,11 +27,10 @@ namespace SIGEBI.Test.Application
 
             var loggerMock = new Mock<ILogger<PrestamosServices>>();
             var IprestamosRepository = new Mock<IPrestamosRepository>();
-            var createvalidator = new PrestamoCreateValidator(IprestamosRepository.Object, new Mock<ILogger<PrestamoCreateValidator>>().Object);
-            var updatevalidator = new PrestamoUpdateValidator(IprestamosRepository.Object, new Mock<ILogger<PrestamoUpdateValidator>>().Object);
+            var validator = new Mock<IValidatorBase<PrestamoDto>>();
             var cacheservice = new Mock<ICacheService>();
             _context = new SIGEBIContext(options);
-            _prestamosServices = new PrestamosServices(IprestamosRepository.Object, loggerMock.Object, createvalidator, updatevalidator, cacheservice.Object);
+            _prestamosServices = new PrestamosServices(IprestamosRepository.Object, loggerMock.Object, validator.Object, cacheservice.Object);
         }
 
         [Fact]

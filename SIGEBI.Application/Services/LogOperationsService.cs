@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
@@ -16,18 +14,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly ILogOperationsRepository _logOperationsRepository;
         private readonly ILogger<LogOperationsService> _logger;
-        private readonly IValidatorBase<CreateLogOperationDto> _createValidator;
-        private readonly IValidatorBase<UpdateLogOperationDto> _updateValidator;
+        private readonly IValidatorBase<LogOperationsDto> _Validator;
         private readonly ICacheService _cacheService;
 
         public LogOperationsService(ILogOperationsRepository logOperationsRepository, ILogger<LogOperationsService> logger, 
-            IValidatorBase<CreateLogOperationDto> createValidator, IValidatorBase<UpdateLogOperationDto> updateValidator
-            , ICacheService cacheService)
+            IValidatorBase<LogOperationsDto> validator, ICacheService cacheService)
         {
             _logOperationsRepository = logOperationsRepository;
             _logger = logger;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -37,7 +32,18 @@ namespace SIGEBI.Application.Services
             try 
             {
                 //Business validations
-                var createValidator = await _createValidator.ValidateCreate(logOpCreateDto);
+                _logger.LogInformation("Validating LogOperations");
+
+                LogOperationsDto logOperationsDto = new LogOperationsDto()
+                {
+                    Entity = logOpCreateDto.Entity,
+                    Fecha = logOpCreateDto.Fecha,
+                    TypeOperation = logOpCreateDto.TypeOperation,
+                    Descripcion = logOpCreateDto.Descripcion,
+                    StatusOp = (Status)logOpCreateDto.StatusOp
+                };
+
+                var createValidator = await _Validator.Validate(logOperationsDto, 1);
                 if (!createValidator.IsValid)
                 {
                     result.Success = false;
@@ -201,7 +207,16 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var updateValidator = await _updateValidator.ValidateUpdate(logOpUpdateDto);
+                //Business validations
+                _logger.LogInformation("Validating LogOperations");
+
+                LogOperationsDto logOperationsDto = new LogOperationsDto()
+                {
+                    Descripcion = logOpUpdateDto.Descripcion,
+                    StatusOp = (Status)logOpUpdateDto.StatusOp
+                };
+
+                var updateValidator = await _Validator.Validate(logOperationsDto,2);
                 
                 if (!updateValidator.IsValid)
                 {

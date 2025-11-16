@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
@@ -15,17 +13,14 @@ namespace SIGEBI.Application.Services
     {
         private readonly ILibrosRepository _libroRepository;
         private readonly ILogger<LibroService> _logger;
-        private readonly IValidatorBase<LibroCreateDto> _createValidator;
-        private readonly IValidatorBase<LibroUpdateDto> _updateValidator;
+        private readonly IValidatorBase<LibroDto> _Validator;
         private readonly ICacheService _cacheService;
         public LibroService(ILibrosRepository libroRepository, ILogger<LibroService> logger, 
-            IValidatorBase<LibroCreateDto> createValidator, IValidatorBase<LibroUpdateDto> updateValidator
-            , ICacheService cacheService)
+            IValidatorBase<LibroDto> validator,ICacheService cacheService)
         {
             _libroRepository = libroRepository;
             _logger = logger;
-            _updateValidator = updateValidator;
-            _createValidator = createValidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -36,7 +31,21 @@ namespace SIGEBI.Application.Services
             {
                 _logger.LogInformation("Validating book creation for ISBN: {ISBN}", libroCreateDto.ISBN);
                 //Business validations
-                var createValidator = await _createValidator.ValidateCreate(libroCreateDto);
+
+                LibroDto libroDto = new LibroDto()
+                {
+                    ISBN = libroCreateDto.ISBN,
+                    titulo = libroCreateDto.titulo,
+                    autor = libroCreateDto.autor,
+                    editorial = libroCreateDto.editorial,
+                    anoPublicacion = libroCreateDto.anioPublicacion,
+                    categoria = libroCreateDto.categoria,
+                    numPaginas = libroCreateDto.numPaginas,
+                    cantidad = libroCreateDto.cantidad,
+                    IdLgOpLibro = libroCreateDto.IdLgOpLibro,
+                };
+
+                var createValidator = await _Validator.Validate(libroDto,1);
                 if (!createValidator.IsValid)
                 {
                     result.Success = false;
@@ -195,7 +204,21 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Business validations
-                var updateValidator = await _updateValidator.ValidateUpdate(libroUpdateDto);
+                _logger.LogInformation("Validating Libro");
+                LibroDto libroDto = new LibroDto()
+                {
+                    ISBN = libroUpdateDto.ISBN,
+                    titulo = libroUpdateDto.titulo,
+                    autor = libroUpdateDto.autor,
+                    editorial = libroUpdateDto.editorial,
+                    anoPublicacion = libroUpdateDto.anioPublicacion,
+                    categoria = libroUpdateDto.categoria,
+                    numPaginas = libroUpdateDto.numPaginas,
+                    cantidad = libroUpdateDto.cantidad,
+                    IdLgOpLibro = libroUpdateDto.IdLgOpLibro,
+                };
+
+                var updateValidator = await _Validator.Validate(libroDto,2);
                 if (!updateValidator.IsValid)
                 {
                     result.Success = false;

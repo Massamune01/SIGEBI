@@ -13,18 +13,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly ICredencialesRepository _credencialesRepository;
         private readonly ILogger<CredencialesService> _logger;
-        private readonly IValidatorBase<CredencialesCreateDto> _createValidator;
-        private readonly IValidatorBase<CredencialesUpdateDto> _updateValidator;
+        private readonly IValidatorBase<CredencialesGetModel> _Validator;
         private readonly ICacheService _cacheService;
 
         public CredencialesService(ICredencialesRepository credencialesRepository, ILogger<CredencialesService> logger, 
-            IValidatorBase<CredencialesUpdateDto> updateValidator, IValidatorBase<CredencialesCreateDto> createValidator
-            , ICacheService cacheService)
+            IValidatorBase<CredencialesGetModel> validator, ICacheService cacheService)
         {
             _credencialesRepository = credencialesRepository;
             _logger = logger;
-            _updateValidator = updateValidator;
-            _createValidator = createValidator;
+            _Validator = validator;
             _cacheService = cacheService;
         }
 
@@ -35,7 +32,16 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Bussiness Validation
-                var validationResult = await _createValidator.ValidateCreate(createCredencialesDto);
+
+                CredencialesGetModel credencialesGetModel = new CredencialesGetModel()
+                {
+                    ClienteId = createCredencialesDto.ClienteId,
+                    Usuario = createCredencialesDto.Usuario,
+                    PasswordHash = createCredencialesDto.Password
+
+                };
+
+                var validationResult = await _Validator.Validate(credencialesGetModel,1);
                 if (!validationResult.IsValid)
                 {
                     result.Success = false;
@@ -78,13 +84,13 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_Credenciales";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            /*if (_cacheService.TryGet(cacheKey, out CredencialesGetModel list))
+            if (_cacheService.TryGet(cacheKey, out List<CredencialesGetModel> list))
             {
                 result.Success = true;
                 result.Data = list;
                 result.Message = "Credenciales retrieved from cache.";
                 return result;
-            }*/
+            }
             try
             {
                 _logger.LogInformation("Retrieving all credentials.");
@@ -189,7 +195,14 @@ namespace SIGEBI.Application.Services
             {
                 _logger.LogInformation("Validating update for Credenciales with ID: {CredID}", updateCredencialesDto.Id);
                 //Bussiness Validation
-                var validationResult = await _updateValidator.ValidateUpdate(updateCredencialesDto);
+
+                CredencialesGetModel credencialesGetModel = new CredencialesGetModel()
+                {
+                    ClienteId = updateCredencialesDto.Id,
+                    Usuario = updateCredencialesDto.Usuario
+                };
+
+                var validationResult = await _Validator.Validate(credencialesGetModel,2);
                 if (!validationResult.IsValid)
                 {
                     result.Success = false;

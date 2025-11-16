@@ -20,8 +20,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Bibliotecario
         public static void AddBibliotecarioDependency(this IServiceCollection Services)
         {
             Services.AddScoped<IBibliotecariosRepository, BibliotecarioRepository>();
-            Services.AddScoped<IValidatorBase<BibliotecarioCreateDto>, BibliotecarioCreateValidator>();
-            Services.AddScoped<IValidatorBase<BibliotecarioUpdateDto>, BibliotecarioUpdateValidator>();
+            Services.AddScoped<IValidatorBase<BibliotecarioDto>, BibliotecarioValidator>();
             Services.AddTransient<IBibliotecarioService, BibliotecarioService>();
         }
     }

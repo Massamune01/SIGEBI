@@ -48,7 +48,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             .ToListAsync();
         }
 
-        public async Task<Libro?> GetLibroById(int isbn)
+        public async Task<Libro?> GetLibroById(Int64 isbn)
         {
             return await _context.Set<Libro>()
             .FirstOrDefaultAsync(l => l.ISBN == isbn);

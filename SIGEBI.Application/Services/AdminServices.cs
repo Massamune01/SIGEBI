@@ -14,18 +14,15 @@ namespace SIGEBI.Application.Services
     {
         private readonly ILogger<AdminServices> _logger;
         private readonly IAdminRepository _adminRepository;
-        private readonly IValidatorBase<AdminCreateDto> _createValidator;
-        private readonly IValidatorBase<AdminUpdateDto> _updateValidator;
+        private readonly IValidatorBase<AdminDto> _Validator;
         private readonly ICacheService _cacheService;
 
         public AdminServices(IAdminRepository adminRepository, ILogger<AdminServices> logger, 
-            IValidatorBase<AdminCreateDto> createValidator, IValidatorBase<AdminUpdateDto> updateValidator
-            , ICacheService cacheService)
+            IValidatorBase<AdminDto> validator, ICacheService cacheService)
         {
             _logger = logger;
             _adminRepository = adminRepository;
-            _createValidator = createValidator;
-            _updateValidator = updateValidator;
+            _Validator = validator;
             _cacheService = cacheService;
 
         }
@@ -38,15 +35,26 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Validaciones de negocio
-                var adminvalidation =await _createValidator.ValidateCreate(adminCreateDto);
+                _logger.LogInformation("Validating admin data");
+                AdminDto adminDto = new AdminDto()
+                {
+                    Nombre = adminCreateDto.Nombre,
+                    Apellido = adminCreateDto.Apellido,
+                    Cedula = adminCreateDto.Cedula,
+                    Edad = adminCreateDto.Edad,
+                    Genero = adminCreateDto.Genero,
+                    Email = adminCreateDto.Email,
+                    Nacimiento = adminCreateDto.Nacimiento,
+                    RolId = adminCreateDto.RolId
+                };
+
+                var adminvalidation =await _Validator.Validate(adminDto,1);
                 if (!adminvalidation.IsValid) 
                 { 
                     result.Success = false;
                     result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
                     return result;
                 }
-
-                _logger.LogInformation("Validating admin data");
 
                 Admin admin = new Admin()
                 {
@@ -212,7 +220,23 @@ namespace SIGEBI.Application.Services
             try
             {
                 //Validaciones de negocio
-                var adminvalidation = await _updateValidator.ValidateUpdate(adminUpdateDto);
+
+                AdminDto adminDto = new AdminDto()
+                {
+                    Nombre = adminUpdateDto.Nombre,
+                    Apellido = adminUpdateDto.Apellido,
+                    Cedula = adminUpdateDto.Cedula,
+                    Edad = adminUpdateDto.Edad,
+                    Genero = adminUpdateDto.Genero,
+                    Email = adminUpdateDto.Email,
+                    Nacimiento = adminUpdateDto.Nacimiento,
+                    RolId = adminUpdateDto.RolId,
+                    IdLgOpAdmin = adminUpdateDto.IdLgOpAdmin,
+                    AdminEstatus = adminUpdateDto.AdminEstatus
+
+                };
+
+                var adminvalidation = await _Validator.Validate(adminDto,2);
                 if (!adminvalidation.IsValid)
                 {
                     result.Success = false;
@@ -246,7 +270,7 @@ namespace SIGEBI.Application.Services
                     Email = adminUpdateDto.Email,
                     Nacimiento = adminUpdateDto.Nacimiento,
                     RolId = adminUpdateDto.RolId,
-                    AdminEstatus = (adminUpdateDto.AdminEstatus ?? Status.Activo),
+                    AdminEstatus = adminUpdateDto.AdminEstatus,
                     IdLgOpAdmin = adminUpdateDto.IdLgOpAdmin
                 };
 
@@ -273,5 +297,6 @@ namespace SIGEBI.Application.Services
             }
             return result;
         }
+
     }
 }

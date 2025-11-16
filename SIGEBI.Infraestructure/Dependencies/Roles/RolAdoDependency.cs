@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Roles
         public static void AddRolAdoDependency(this IServiceCollection Services)
         {
             Services.AddScoped<IRolRepository, RolRepositoryAdo>();
-            Services.AddScoped<IValidatorBase<RolCreateDto>, RolCreateValidator>();
-            Services.AddScoped<IValidatorBase<RolUpdateDto>, RolUpdateValidator>();
+            Services.AddScoped<IValidatorBase<RolDto>, RolValidator>();
             Services.AddTransient<IRolService, RolService>();
         }
     }

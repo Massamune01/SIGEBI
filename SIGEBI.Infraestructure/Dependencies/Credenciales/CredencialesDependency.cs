@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Credenciales
         public static void AddCredencialesDependency(this IServiceCollection Services)
         {
             Services.AddScoped<ICredencialesRepository, CredencialesRepositoryAdo>();
-            Services.AddScoped<IValidatorBase<CredencialesCreateDto>, CredencialesCreateValidator>();
-            Services.AddScoped<IValidatorBase<CredencialesUpdateDto>, CredencialesUpdateValidator>();
+            Services.AddScoped<IValidatorBase<CredencialesGetModel>, CredencialesValidator>();
             Services.AddTransient<ICredencialesService, CredencialesService>();
         }
     }

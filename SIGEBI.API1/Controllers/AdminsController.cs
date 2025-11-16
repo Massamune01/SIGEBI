@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.AdminDtos;
+using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Application.Services;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -9,95 +14,81 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class AdminsController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminsController(SIGEBIContext context)
+        public AdminsController(IAdminService adminService)
         {
-            _context = context;
+            _adminService = adminService;
         }
 
         // GET: api/Admins
         [HttpGet("GetAllAdmin")]
         public async Task<ActionResult<IEnumerable<Admin>>> GetAdmin()
         {
-            return await _context.Admin.ToListAsync();
+            ServiceResult result = await _adminService.GetAllAdminAsync();
+
+            if(!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // GET: api/Admins/5
         [HttpGet("GetAdminById")]
         public async Task<ActionResult<Admin>> GetAdmin(int id)
         {
-            var admin = await _context.Admin.FindAsync(id);
+            ServiceResult result = await _adminService.GetAdminByIdAsync(id);
 
-            if (admin == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            return admin;
+            return Ok(result);
         }
 
         // PUT: api/Admins/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("UpdateAdmin")]
-        public async Task<IActionResult> PutAdmin(int id, Admin admin)
+        public async Task<IActionResult> PutAdmin(AdminUpdateDto adminUpdateDto)
         {
-            if (id != admin.Id)
+            ServiceResult result = await _adminService.UpdateAdminAsync(adminUpdateDto);
+            if (!result.Success)
             {
-                return BadRequest();
+                return BadRequest(result);
             }
-
-            _context.Entry(admin).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!AdminExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/Admins
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-admin")]
-        public async Task<ActionResult<Admin>> PostAdmin(Admin admin)
+        public async Task<ActionResult<Admin>> PostAdmin(AdminCreateDto adminCreateDto)
         {
-            _context.Admin.Add(admin);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _adminService.CreateAdminAsync(adminCreateDto);
 
-            return CreatedAtAction("GetAdmin", new { id = admin.Id }, admin);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // DELETE: api/Admins/5
         [HttpDelete("remove-admin")]
         public async Task<IActionResult> DeleteAdmin(int id)
         {
-            var admin = await _context.Admin.FindAsync(id);
-            if (admin == null)
+            ServiceResult result = await _adminService.DeleteAdminAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            _context.Admin.Remove(admin);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool AdminExists(int id)
-        {
-            return _context.Admin.Any(e => e.Id == id);
+            return Ok(result);
         }
     }
 }

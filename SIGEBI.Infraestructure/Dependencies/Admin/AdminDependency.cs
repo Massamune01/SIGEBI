@@ -14,8 +14,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Admin
         public static void AddAdminDependency(this IServiceCollection services)
         {
             services.AddScoped<IAdminRepository, AdminRepository>();
-            services.AddScoped<IValidatorBase<AdminCreateDto>, AdminCreateValidation>();
-            services.AddScoped<IValidatorBase<AdminUpdateDto>, AdminUpdateValidator>();
+            services.AddScoped<IValidatorBase<AdminDto>, AdminValidator>();
             services.AddTransient<IAdminService, AdminServices>();
         }
     }

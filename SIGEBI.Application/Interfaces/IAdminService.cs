@@ -10,5 +10,6 @@ namespace SIGEBI.Application.Interfaces
         Task<ServiceResult> CreateAdminAsync(AdminCreateDto adminCreateDto);
         Task<ServiceResult> UpdateAdminAsync(AdminUpdateDto adminUpdateDto);
         Task<ServiceResult> DeleteAdminAsync(int id);
+
     }
 }

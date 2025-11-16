@@ -13,19 +13,17 @@ namespace SIGEBI.Application.Services
     {
         private readonly IRolRepository _rolRepository;
         private readonly ILogger<RolService> _logger;
-        private readonly IValidatorBase<RolCreateDto> _rolCreateValidator;
-        private readonly IValidatorBase<RolUpdateDto> _rolUpdateValidator;
+        private readonly IValidatorBase<RolDto> _Validator;
         private readonly ICacheService _cacheService;
 
 
         public RolService(IRolRepository rolRepository, ILogger<RolService> logger, 
-            IValidatorBase<RolUpdateDto> rolUpdateValidator, IValidatorBase<RolCreateDto> createValidator
-            , ICacheService cacheService)
+            IValidatorBase<RolDto> validator, ICacheService cacheService)
         {
             _rolRepository = rolRepository;
             _logger = logger;
-            _rolUpdateValidator = rolUpdateValidator;
-            _rolCreateValidator = createValidator;
+            _Validator = validator;
+            _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateRol(RolCreateDto createRolDto)
@@ -34,8 +32,14 @@ namespace SIGEBI.Application.Services
 
             try
             {
-                _logger.LogInformation("Validating role creation data for role: {RolName}", createRolDto.Nombre);
-                var validationResult = await _rolCreateValidator.ValidateCreate(createRolDto);
+                _logger.LogInformation("Validating role creation data for role: {RolName}", createRolDto.Rol);
+
+                RolDto rolDto = new RolDto
+                {
+                    Rol = createRolDto.Rol
+                };
+
+                var validationResult = await _Validator.Validate(rolDto,1);
                 if (validationResult.Errors.Any())
                 {
                     result.Success = false;
@@ -44,7 +48,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
 
-                _logger.LogInformation("Creating a role with name: {RolName}", createRolDto.Nombre);
+                _logger.LogInformation("Creating a role with name: {RolName}", createRolDto.Rol);
 
                 if (createRolDto is null)
                 {
@@ -55,7 +59,7 @@ namespace SIGEBI.Application.Services
 
                 Roles rol = new Roles()
                 {
-                    Rol = createRolDto.Nombre,
+                    Rol = createRolDto.Rol,
                     IdLgOpRol = createRolDto.IdLgOpRol
                 };
 
@@ -63,7 +67,7 @@ namespace SIGEBI.Application.Services
                 result.Success = true;
                 result.Data = existingRol;
                 result.Message = "Role created successfully.";
-                //_cacheService.ClearKeys();
+                _cacheService.ClearKeys();
             }
             catch (Exception ex)
             {
@@ -131,7 +135,12 @@ namespace SIGEBI.Application.Services
             try
             {
                 _logger.LogInformation("Validating role update data for role ID: {RolId}", updateRolDto.Id);
-                var validationResult = await _rolUpdateValidator.ValidateUpdate(updateRolDto);
+                RolDto rolDto = new RolDto
+                {
+                    Rol = updateRolDto.Rol
+                };
+
+                var validationResult = await _Validator.Validate(rolDto, 2);
                 if (validationResult.Errors.Any())
                 {
                     result.Success = false;

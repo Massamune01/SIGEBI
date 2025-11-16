@@ -105,6 +105,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             var result = new OperationResult();
             try
             {
+
                 var credentials = await _dbHelper.ExecuteReaderAsync(
                     "SP_GET_ALL_CREDENCIALES",
                     reader => new CredencialesGetModel

@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Prestamo
         public static void AddPrestamoDependency(this IServiceCollection Services)
         {
             Services.AddScoped<IPrestamosRepository, PrestamosRepository>();
-            Services.AddScoped<IValidatorBase<PrestamoCreateDto>, PrestamoCreateValidator>();
-            Services.AddScoped<IValidatorBase<PrestamoUpdateDto>, PrestamoUpdateValidator>();
+            Services.AddScoped<IValidatorBase<PrestamoDto>, PrestamoValidator>();
             Services.AddTransient<IPrestamosService, PrestamosServices>();
         }
     }

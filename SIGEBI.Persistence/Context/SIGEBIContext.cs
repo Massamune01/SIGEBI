@@ -18,6 +18,11 @@ namespace SIGEBI.Persistence.Context
         public SIGEBIContext(DbContextOptions<SIGEBIContext> options) : base(options)
         { }
 
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder.Conventions.Add(_ => new BlankTriggerAddingConvention());
+        }
+
         #region "Entidades del módulo de Configuración"
 
         public DbSet<RolGetModel> RolGetModel { get; set; }

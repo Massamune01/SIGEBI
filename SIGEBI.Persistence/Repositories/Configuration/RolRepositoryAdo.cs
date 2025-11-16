@@ -201,12 +201,13 @@ namespace SIGEBI.Persistence.Repositories.Configuration
 
             var validator = new ValidarRol();
 
-            var validationResult = await validator.ValidateAsync(entity);
+            var validateResult = validator.Validate(entity);
 
-            if (!validationResult.IsValid)
+            if (!validateResult.IsValid)
             {
+                foreach (var error in validateResult.Errors)
+                    result.Message += error.ErrorMessage + "; ";
                 result.Success = false;
-                result.Message = string.Join("The validation is not valid");
                 return result;
             }
 

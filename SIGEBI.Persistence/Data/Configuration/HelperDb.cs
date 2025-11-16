@@ -19,6 +19,7 @@ namespace SIGEBI.Infraestructure.Data.Configuration
             var resultList = new List<T>();
 
             using var conn = new SqlConnection(_connectionString);
+            
             using var cmd = new SqlCommand(storedProcedure, conn)
             {
                 CommandType = System.Data.CommandType.StoredProcedure

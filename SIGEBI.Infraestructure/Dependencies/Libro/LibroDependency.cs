@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Libro
         public static void AddLibroDependency(this IServiceCollection Services)
         {
             Services.AddScoped<ILibrosRepository, LibroRepository>();
-            Services.AddScoped<IValidatorBase<LibroCreateDto>, LibroCreateValidator>();
-            Services.AddScoped<IValidatorBase<LibroUpdateDto>, LibroUpdateValidator>();
+            Services.AddScoped<IValidatorBase<LibroDto>, LibroValidator>();
             Services.AddTransient<ILibroService, LibroService>();
         }
     }

@@ -19,8 +19,7 @@ namespace SIGEBI.Infraestructure.Dependencies.LogOperation
         public static void AddLogOperationDependency(this IServiceCollection Services)
         {
             Services.AddScoped<ILogOperationsRepository, LogOperationsRepository>();
-            Services.AddScoped<IValidatorBase<CreateLogOperationDto>, LogOperationCreateValidator>();
-            Services.AddScoped<IValidatorBase<UpdateLogOperationDto>, LogOperationUpdateValidator>();
+            Services.AddScoped<IValidatorBase<LogOperationsDto>, LogOperationValidator>();
             Services.AddTransient<ILogOperationsService, LogOperationsService>();
         }
     }
