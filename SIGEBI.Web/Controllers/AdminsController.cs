@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
@@ -8,37 +10,39 @@ namespace SIGEBI.Web.Controllers
 {
     public class AdminsController : Controller
     {
-        private readonly SIGEBIContext _context;
         private readonly IAdminService _adminService;
 
-        public AdminsController(IAdminService adminService, SIGEBIContext context)
+        public AdminsController(IAdminService adminService)
         {
-            _context = context;
             _adminService = adminService;
         }
 
         // GET: Admins
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Admin.ToListAsync());
+            ServiceResult result = await _adminService.GetAllAdminAsync();
+
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            return View(result.Data);
         }
 
         // GET: Admins/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+            ServiceResult result = await _adminService.GetAdminByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var admin = await _context.Admin
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (admin == null)
-            {
-                return NotFound();
-            }
-
-            return View(admin);
+            return View(result.Data);
         }
 
         // GET: Admins/Create
@@ -52,31 +56,38 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AdminEstatus,IdLgOpAdmin,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Admin admin)
+        public async Task<IActionResult> Create(AdminCreateDto adminCreateDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(admin);
-                await _context.SaveChangesAsync();
+                ServiceResult result = await _adminService.CreateAdminAsync(adminCreateDto);
+
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(admin);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Admins/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            ServiceResult result = await _adminService.GetAdminByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var admin = await _context.Admin.FindAsync(id);
-            if (admin == null)
-            {
-                return NotFound();
-            }
-            return View(admin);
+            return View(result.Data);
         }
 
         // POST: Admins/Edit/5
@@ -84,39 +95,24 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AdminEstatus,IdLgOpAdmin,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Admin admin)
+        public async Task<IActionResult> Edit(AdminUpdateDto adminUpdateDto)
         {
-            if (id != admin.Id)
+            try
             {
-                return NotFound();
-            }
+                ServiceResult result = await _adminService.UpdateAdminAsync(adminUpdateDto);
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (!result.Success)
                 {
-                    _context.Update(admin);
-                    await _context.SaveChangesAsync();
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!AdminExists(admin.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(admin);
-        }
-
-        private bool AdminExists(int id)
-        {
-            return _context.Admin.Any(e => e.Id == id);
-        }
+            catch
+            {
+                return View();
+            }
+         }
     }
 }

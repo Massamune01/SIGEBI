@@ -198,6 +198,7 @@ namespace SIGEBI.Application.Services
 
                 CredencialesGetModel credencialesGetModel = new CredencialesGetModel()
                 {
+                     Id = updateCredencialesDto.Id,
                     ClienteId = updateCredencialesDto.Id,
                     Usuario = updateCredencialesDto.Usuario
                 };

@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Application.Services;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -14,95 +18,83 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class ClientesController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly IClienteService _clienteService;
 
-        public ClientesController(SIGEBIContext context)
+        public ClientesController(IClienteService clienteService)
         {
-            _context = context;
+            _clienteService = clienteService;
         }
 
         // GET: api/Clientes
         [HttpGet("GetAllClientes")]
         public async Task<ActionResult<IEnumerable<Cliente>>> GetClientes()
         {
-            return await _context.Cliente.ToListAsync();
+            ServiceResult result = await _clienteService.GetAllClientesAsync();
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // GET: api/Clientes/5
         [HttpGet("GetClienteById")]
         public async Task<ActionResult<Cliente>> GetCliente(int id)
         {
-            var cliente = await _context.Cliente.FindAsync(id);
+            ServiceResult result = await _clienteService.GetClienteByIdAsync(id);
 
-            if (cliente == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            return cliente;
+            return Ok(result);
         }
 
         // PUT: api/Clientes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-cliente")]
-        public async Task<IActionResult> PutCliente(int id, Cliente cliente)
+        public async Task<IActionResult> PutCliente(ClienteUpdateDto clienteUpdateDto)
         {
-            if (id != cliente.Id)
+            ServiceResult result = await _clienteService.UpdateClienteAsync(clienteUpdateDto);
+
+            if (!result.Success)
             {
-                return BadRequest();
+                return BadRequest(result.Message);
             }
 
-            _context.Entry(cliente).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClienteExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/Clientes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-cliente")]
-        public async Task<ActionResult<Cliente>> PostCliente(Cliente cliente)
+        public async Task<ActionResult<Cliente>> PostCliente(ClienteCreateDto clienteCreateDto)
         {
-            _context.Cliente.Add(cliente);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _clienteService.CreateClienteAsync(clienteCreateDto);
 
-            return CreatedAtAction("GetCliente", new { id = cliente.Id }, cliente);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // DELETE: api/Clientes/5
         [HttpDelete("remove-cliente")]
         public async Task<IActionResult> DeleteCliente(int id)
         {
-            var cliente = await _context.Cliente.FindAsync(id);
-            if (cliente == null)
+            ServiceResult result = await _clienteService.DeleteClienteAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            _context.Cliente.Remove(cliente);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool ClienteExists(int id)
-        {
-            return _context.Cliente.Any(e => e.Id == id);
+            return Ok(result);
         }
     }
 }

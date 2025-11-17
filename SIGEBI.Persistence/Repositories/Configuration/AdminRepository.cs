@@ -1,8 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SIGEBI.Application.Dtos.Configuration.AdminDtos;
-using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration;
@@ -10,7 +8,6 @@ using SIGEBI.Domain.Enums;
 using SIGEBI.Persistence.Base;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Security.Configuration.ValidarAdmin;
-using SIGEBI.Persistence.Security.Configuration.ValidarBibliot;
 
 namespace SIGEBI.Persistence.Repositories.Configuration
 {
@@ -25,7 +22,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         public AdminRepository(SIGEBIContext context) : base(context)
         {
         }
-
+        
         public async Task<List<Admin>> GetAdminByIdAsync(int id)
         {
             try
@@ -192,14 +189,19 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 _logger.LogInformation("Updating Admin entity.");
                 result = await base.Update(entity);
                 await _context.SaveChangesAsync();
+
+                result.Success = true;
+                result.Message = "Admin Updated Succesfuly";
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating Admin entity");
                 result.Success = false;
-                result.Message = "Error updating Admin entity.";
+                result.Message = "Error updating Admin entity."; 
+                return result;
             }
-            return result;
+           
         }
     }
 }

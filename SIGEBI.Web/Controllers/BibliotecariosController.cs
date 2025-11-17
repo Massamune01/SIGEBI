@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -7,35 +10,39 @@ namespace SIGEBI.Web.Controllers
 {
     public class BibliotecariosController : Controller
     {
-        private readonly SIGEBIContext _context;
+        private readonly IBibliotecarioService _bibliotecarioService;
 
-        public BibliotecariosController(SIGEBIContext context)
+        public BibliotecariosController(IBibliotecarioService bibliotecarioService)
         {
-            _context = context;
+            _bibliotecarioService = bibliotecarioService;
         }
 
         // GET: Bibliotecarios
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Bibliotecarios.ToListAsync());
+            ServiceResult result = await _bibliotecarioService.GetAllBibliotecariosAsync();
+
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            return View(result.Data);
         }
 
         // GET: Bibliotecarios/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+            ServiceResult result = await _bibliotecarioService.GetBibliotecarioByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var bibliotecarios = await _context.Bibliotecarios
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (bibliotecarios == null)
-            {
-                return NotFound();
-            }
-
-            return View(bibliotecarios);
+            return View(result.Data);
         }
 
         // GET: Bibliotecarios/Create
@@ -49,31 +56,38 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TotalDevoluciones,TotalHorasTrabajadas,TotalClientesAtendidos,TotalPrestamos,BiblioEstatus,IdLgOpBiblio,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Bibliotecarios bibliotecarios)
+        public async Task<IActionResult> Create(BibliotecarioCreateDto bibliotecarioCreateDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(bibliotecarios);
-                await _context.SaveChangesAsync();
+                ServiceResult result = await _bibliotecarioService.CreateBibliotecarioAsync(bibliotecarioCreateDto);
+
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(bibliotecarios);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Bibliotecarios/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            ServiceResult result = await _bibliotecarioService.GetBibliotecarioByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var bibliotecarios = await _context.Bibliotecarios.FindAsync(id);
-            if (bibliotecarios == null)
-            {
-                return NotFound();
-            }
-            return View(bibliotecarios);
+            return View(result.Data);
         }
 
         // POST: Bibliotecarios/Edit/5
@@ -81,72 +95,24 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TotalDevoluciones,TotalHorasTrabajadas,TotalClientesAtendidos,TotalPrestamos,BiblioEstatus,IdLgOpBiblio,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Bibliotecarios bibliotecarios)
+        public async Task<IActionResult> Edit(BibliotecarioUpdateDto bibliotecarioUpdateDto)
         {
-            if (id != bibliotecarios.Id)
+            try
             {
-                return NotFound();
-            }
+                ServiceResult result = await _bibliotecarioService.UpdateBibliotecarioAsync(bibliotecarioUpdateDto);
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (!result.Success)
                 {
-                    _context.Update(bibliotecarios);
-                    await _context.SaveChangesAsync();
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BibliotecariosExists(bibliotecarios.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(bibliotecarios);
-        }
-
-        // GET: Bibliotecarios/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
+            catch
             {
-                return NotFound();
+                return View();
             }
-
-            var bibliotecarios = await _context.Bibliotecarios
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (bibliotecarios == null)
-            {
-                return NotFound();
-            }
-
-            return View(bibliotecarios);
-        }
-
-        // POST: Bibliotecarios/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var bibliotecarios = await _context.Bibliotecarios.FindAsync(id);
-            if (bibliotecarios != null)
-            {
-                _context.Bibliotecarios.Remove(bibliotecarios);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool BibliotecariosExists(int id)
-        {
-            return _context.Bibliotecarios.Any(e => e.Id == id);
         }
     }
 }

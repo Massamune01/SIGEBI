@@ -11,9 +11,9 @@ namespace SIGEBI.Application.Interfaces
     public interface ILibroService
     {
         Task<ServiceResult> GetAllLibrosAsync();
-        Task<ServiceResult> GetLibroByIdAsync(int id);
+        Task<ServiceResult> GetLibroByIdAsync(Int64 id);
         Task<ServiceResult> CreateLibroAsync(LibroCreateDto libroCreateDto);
         Task<ServiceResult> UpdateLibroAsync(LibroUpdateDto libroUpdateDto);
-        Task<ServiceResult> DeleteLibroAsync(int id);
+        Task<ServiceResult> DeleteLibroAsync(Int64 id);
     }
 }

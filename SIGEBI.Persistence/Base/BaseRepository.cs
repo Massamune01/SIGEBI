@@ -34,7 +34,7 @@ namespace SIGEBI.Persistence.Base
             }
             catch (Exception ex) 
             { 
-            result.Success = false;
+                result.Success = false;
                 result.Message = "Error: " + ex.Message ;
             }
 

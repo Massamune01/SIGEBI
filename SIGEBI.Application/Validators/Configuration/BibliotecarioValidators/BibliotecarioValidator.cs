@@ -31,7 +31,7 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                 {
                     //Check if Cedula is already in use
                     var existingCedula = _biblioRepository.GetBiblioByCedula(entity.Cedula).Result;
-                    if (existingCedula != null)
+                    if (existingCedula.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Cedula is already in use.");
                     }
@@ -44,7 +44,7 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
 
                     // Check if email is already in use
                     var existingEmail = _biblioRepository.GetBiblioByEmail(entity.Email).Result;
-                    if (existingEmail != null)
+                    if (existingEmail.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Email is already in use.");
                     }
@@ -55,12 +55,6 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                 }
                 else if(opcion == 2) // Update
                 {
-                    //Check if Cedula is already in use
-                    var existingCedula = _biblioRepository.GetBiblioByCedula(entity.Cedula).Result;
-                    if (existingCedula != null)
-                    {
-                        validationResult.AddError("Cedula is already in use.");
-                    }
 
                     // Check if Email is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Email))
@@ -68,12 +62,6 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                         validationResult.AddError("Email is required.");
                     }
 
-                    // Check if email is already in use
-                    var existingEmail = _biblioRepository.GetBiblioByEmail(entity.Email).Result;
-                    if (existingEmail != null)
-                    {
-                        validationResult.AddError("Email is already in use.");
-                    }
                     // TotalDevoluciones cannot be negative
                     if(entity.TotalDevoluciones < 0)
                     {

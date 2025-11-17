@@ -98,7 +98,7 @@ namespace SIGEBI.Application.Services
             }
         }
 
-        public async Task<ServiceResult> DeleteLibroAsync(int id)
+        public async Task<ServiceResult> DeleteLibroAsync(Int64 id)
         {
             ServiceResult result = new ServiceResult();
             try
@@ -137,7 +137,7 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_Libros";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<LibroDto> list))
+            if (_cacheService.TryGet(cacheKey, out List<Libro> list))
             {
                 result.Success = true;
                 result.Data = list;
@@ -156,10 +156,13 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
 
+                List<Libro> libroList = libros.Data;
+
+
                 result.Success = true;
-                result.Data = libros;
+                result.Data = libroList;
                 result.Message = "Books retrieved successfully.";
-                _cacheService.Set(cacheKey, result.Data);
+                _cacheService.Set(cacheKey, libroList);
                 return result;
             }
             catch (Exception ex)
@@ -171,7 +174,7 @@ namespace SIGEBI.Application.Services
             }
         }
 
-        public async Task<ServiceResult> GetLibroByIdAsync(int id)
+        public async Task<ServiceResult> GetLibroByIdAsync(Int64 id)
         {
             ServiceResult result = new ServiceResult();
             try
@@ -211,7 +214,7 @@ namespace SIGEBI.Application.Services
                     titulo = libroUpdateDto.titulo,
                     autor = libroUpdateDto.autor,
                     editorial = libroUpdateDto.editorial,
-                    anoPublicacion = libroUpdateDto.anioPublicacion,
+                    anoPublicacion = libroUpdateDto.anoPublicacion,
                     categoria = libroUpdateDto.categoria,
                     numPaginas = libroUpdateDto.numPaginas,
                     cantidad = libroUpdateDto.cantidad,
@@ -233,20 +236,13 @@ namespace SIGEBI.Application.Services
                     result.Message = "The book data cannot be null.";
                     return result;
                 }
-                var oLibro = await _libroRepository.GetLibroById(libroUpdateDto.ISBN);
-                if (oLibro is null)
-                {
-                    result.Success = false;
-                    result.Message = "Book not found.";
-                    return result;
-                }
                 Libro libro = new Libro()
                 {
                     ISBN = libroUpdateDto.ISBN,
                     titulo = libroUpdateDto.titulo,
                     autor = libroUpdateDto.autor,
                     editorial = libroUpdateDto.editorial,
-                    anoPublicacion = libroUpdateDto.anioPublicacion,
+                    anoPublicacion = libroUpdateDto.anoPublicacion,
                     categoria = libroUpdateDto.categoria,
                     numPaginas = libroUpdateDto.numPaginas,
                     cantidad = libroUpdateDto.cantidad,

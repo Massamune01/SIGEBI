@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Application.Services;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -8,35 +12,35 @@ namespace SIGEBI.Web.Controllers
 {
     public class ClientesController : Controller
     {
-        private readonly SIGEBIContext _context;
+        private readonly IClienteService _clienteService;
 
-        public ClientesController(SIGEBIContext context)
+        public ClientesController(IClienteService clienteService)
         {
-            _context = context;
+            _clienteService = clienteService;
         }
 
         // GET: Clientes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Cliente.ToListAsync());
+            ServiceResult result = await _clienteService.GetAllClientesAsync();
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+            return View(result.Data);
         }
 
         // GET: Clientes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+            ServiceResult result = await _clienteService.GetClienteByIdAsync(id);
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
-
-            var cliente = await _context.Cliente
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
-
-            return View(cliente);
+            return View(result.Data);
         }
 
         // GET: Clientes/Create
@@ -50,31 +54,34 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("TotalDevoluciones,CapacidadPrest,TotalDevolRestrasadas,TotalPrestamos,PrestamosActivos,StatusCliente,IdLgOpCliente,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Cliente cliente)
+        public async Task<IActionResult> Create(ClienteCreateDto clienteCreateDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(cliente);
-                await _context.SaveChangesAsync();
+                ServiceResult result = await _clienteService.CreateClienteAsync(clienteCreateDto);
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(cliente);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Clientes/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            ServiceResult result = await _clienteService.GetClienteByIdAsync(id);
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
-
-            var cliente = await _context.Cliente.FindAsync(id);
-            if (cliente == null)
-            {
-                return NotFound();
-            }
-            return View(cliente);
+            return View(result.Data);
         }
 
         // POST: Clientes/Edit/5
@@ -82,39 +89,22 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TotalDevoluciones,CapacidadPrest,TotalDevolRestrasadas,TotalPrestamos,PrestamosActivos,StatusCliente,IdLgOpCliente,Id,Nombre,Apellido,Cedula,Edad,Genero,Email,Nacimiento,RolId")] Cliente cliente)
+        public async Task<IActionResult> Edit(ClienteUpdateDto clienteUpdateDto)
         {
-            if (id != cliente.Id)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                ServiceResult result = await _clienteService.UpdateClienteAsync(clienteUpdateDto);
+                if (!result.Success)
                 {
-                    _context.Update(cliente);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ClienteExists(cliente.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(cliente);
-        }
-
-        private bool ClienteExists(int id)
-        {
-            return _context.Cliente.Any(e => e.Id == id);
+            catch
+            {
+                return View();
+            }
         }
     }
 }

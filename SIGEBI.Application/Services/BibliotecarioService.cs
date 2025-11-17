@@ -41,13 +41,13 @@ namespace SIGEBI.Application.Services
                     Edad = bibliotecarioCreateDto.Edad,
                     Genero = bibliotecarioCreateDto.Genero,
                     Email = bibliotecarioCreateDto.Email,
+                    Cedula = bibliotecarioCreateDto.Cedula,
                     Nacimiento = bibliotecarioCreateDto.Nacimiento,
-                    RolId = bibliotecarioCreateDto.RolId,
                     TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
                     TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
                     TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
-                };
+                }; 
 
                 var createvalidator = await _Validator.Validate(bibliotecarioDto,1);
                 if (!createvalidator.IsValid)
@@ -73,13 +73,11 @@ namespace SIGEBI.Application.Services
                     Genero = bibliotecarioCreateDto.Genero,
                     Email = bibliotecarioCreateDto.Email,
                     Nacimiento = bibliotecarioCreateDto.Nacimiento,
-                    RolId = bibliotecarioCreateDto.RolId,
+                    Cedula = bibliotecarioCreateDto.Cedula,
                     TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
                     TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
-                    BiblioEstatus = bibliotecarioCreateDto.BiblioEstatus ?? Domain.Enums.Status.Activo,
-                    IdLgOpBiblio = bibliotecarioCreateDto.IdLgOpBiblio
+                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0
                 };
                 var createdBibliotecario = await _bibliotecariosRepository.Save(newBibliotecario);
                 if (createdBibliotecario is null)
@@ -146,7 +144,7 @@ namespace SIGEBI.Application.Services
             const string cacheKey = "ALL_Bibliotecario";
 
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<BibliotecarioDto> list))
+            if (_cacheService.TryGet(cacheKey, out List<Bibliotecarios> list))
             {
                 result.Success = true;
                 result.Data = list;
@@ -164,11 +162,13 @@ namespace SIGEBI.Application.Services
                     result.Message = "No bibliotecarios found.";
                     return result;
                 }
-                
-                _cacheService.Set(cacheKey, bibliotecarios.Data);
+
+                List<Bibliotecarios> bibliotecariosList = bibliotecarios.Data;
+
+                _cacheService.Set(cacheKey, bibliotecariosList);
 
                 result.Success = true;
-                result.Data = bibliotecarios.Data;
+                result.Data = bibliotecariosList;
                 result.Message = "Bibliotecarios retrieved successfully.";
                 _logger.LogInformation(result.Message);
                 
@@ -226,8 +226,8 @@ namespace SIGEBI.Application.Services
                     Edad = bibliotecarioUpdateDto.Edad,
                     Genero = bibliotecarioUpdateDto.Genero,
                     Email = bibliotecarioUpdateDto.Email,
+                    Cedula = bibliotecarioUpdateDto.Cedula,
                     Nacimiento = bibliotecarioUpdateDto.Nacimiento,
-                    RolId = bibliotecarioUpdateDto.RolId,
                     TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,
                     TotalClientesAtendidos = bibliotecarioUpdateDto.TotalClientesAtendidos ?? 0,
@@ -243,34 +243,25 @@ namespace SIGEBI.Application.Services
                 }
 
                 _logger.LogInformation($"Updating bibliotecario with ID: {bibliotecarioUpdateDto.Id}");
-                var existingBibliotecarioResult = await _bibliotecariosRepository.GetBiblioById(bibliotecarioUpdateDto.Id);
-                if (existingBibliotecarioResult is null || !existingBibliotecarioResult.Any())
-                {
-                    result.Success = false;
-                    result.Message = "Bibliotecario not found.";
-                    return result;
-                }
                 Bibliotecarios oBibliotecarioResult = new Bibliotecarios()
                 {
-                    Id = bibliotecarioUpdateDto.Id,
                     Nombre = bibliotecarioUpdateDto.Nombre,
                     Apellido = bibliotecarioUpdateDto.Apellido,
                     Edad = bibliotecarioUpdateDto.Edad,
                     Genero = bibliotecarioUpdateDto.Genero,
+                    Cedula = bibliotecarioUpdateDto.Cedula,
                     Email = bibliotecarioUpdateDto.Email,
                     Nacimiento = bibliotecarioUpdateDto.Nacimiento,
-                    RolId = bibliotecarioUpdateDto.RolId,
                     TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,
                     TotalClientesAtendidos = bibliotecarioUpdateDto.TotalClientesAtendidos ?? 0,
                     TotalPrestamos = bibliotecarioUpdateDto.TotalPrestamos ?? 0,
                     BiblioEstatus = bibliotecarioUpdateDto.BiblioEstatus ?? Domain.Enums.Status.Activo,
-                    IdLgOpBiblio = bibliotecarioUpdateDto.IdLgOpBiblio
                 };
 
                 var updateResult = await _bibliotecariosRepository.Update(oBibliotecarioResult);
 
-                if (!updateResult.Success || updateResult.Data is null)
+                if (!updateResult.Success)
                 {
                     result.Success = false;
                     result.Message = "Failed to update the bibliotecario.";

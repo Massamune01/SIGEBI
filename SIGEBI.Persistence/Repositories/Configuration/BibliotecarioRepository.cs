@@ -189,15 +189,17 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 _logger.LogInformation("Updating Bibliotecario entity.");
                 result = await base.Update(entity);
                 await _context.SaveChangesAsync();
-
+                result.Success = true;
+                result.Message = "Bibliotecario Update Succesfuly";
+                return result;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating Libro entity");
                 result.Success = false;
                 result.Message = "Error updating Libro entity.";
+                return result;
             }
-            return result;
         }
     }
 }

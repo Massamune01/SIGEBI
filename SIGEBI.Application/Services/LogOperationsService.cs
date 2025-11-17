@@ -138,7 +138,7 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_LogOps";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<LogOperationsDto> list))
+            if (_cacheService.TryGet(cacheKey, out List<LogOperations> list))
             {
                 result.Success = true;
                 result.Data = list;
@@ -156,11 +156,14 @@ namespace SIGEBI.Application.Services
                     _logger.LogWarning(result.Message);
                     return result;
                 }
+
+                List<LogOperations> logOpList = logOperations.Data;
+
                 result.Success = true;
-                result.Data = logOperations.Data;
+                result.Data = logOpList;
                 result.Message = "Log operations retrieved successfully.";
                 _logger.LogInformation(result.Message);
-                _cacheService.Set(cacheKey, result.Data);
+                _cacheService.Set(cacheKey, logOpList);
                 return result;
             }
             catch (Exception ex)

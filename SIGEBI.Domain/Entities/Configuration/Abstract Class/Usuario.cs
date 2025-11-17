@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SIGEBI.Domain.Base;
+﻿using System.ComponentModel.DataAnnotations;
 using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Domain.Entities.Configuration
@@ -20,6 +14,6 @@ namespace SIGEBI.Domain.Entities.Configuration
         public Genero Genero { get; set; }
         public string? Email { get; set; }
         public DateOnly? Nacimiento { get; set; }
-        public int RolId { get; set; }
+        public int? RolId { get; set; }
     }
 }

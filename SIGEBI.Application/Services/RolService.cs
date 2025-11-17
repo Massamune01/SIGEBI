@@ -137,6 +137,7 @@ namespace SIGEBI.Application.Services
                 _logger.LogInformation("Validating role update data for role ID: {RolId}", updateRolDto.Id);
                 RolDto rolDto = new RolDto
                 {
+                    Id = updateRolDto.Id,
                     Rol = updateRolDto.Rol
                 };
 

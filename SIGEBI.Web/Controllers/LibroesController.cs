@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.LibroDtos;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Application.Services;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -7,35 +11,39 @@ namespace SIGEBI.Web.Controllers
 {
     public class LibroesController : Controller
     {
-        private readonly SIGEBIContext _context;
+        private readonly ILibroService _libroService;
 
-        public LibroesController(SIGEBIContext context)
+        public LibroesController(ILibroService libroService)
         {
-            _context = context;
+            _libroService = libroService;
         }
 
         // GET: Libroes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Libro.ToListAsync());
+            ServiceResult result = await _libroService.GetAllLibrosAsync();
+
+            if (!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            return View(result.Data);
         }
 
         // GET: Libroes/Details/5
-        public async Task<IActionResult> Details(long? id)
+        public async Task<IActionResult> Details(long id)
         {
-            if (id == null)
+            ServiceResult result = await _libroService.GetLibroByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var libro = await _context.Libro
-                .FirstOrDefaultAsync(m => m.ISBN == id);
-            if (libro == null)
-            {
-                return NotFound();
-            }
-
-            return View(libro);
+            return View(result.Data);
         }
 
         // GET: Libroes/Create
@@ -49,31 +57,38 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ISBN,titulo,autor,editorial,anoPublicacion,categoria,numPaginas,cantidad,Status,IdLgOpLibro")] Libro libro)
+        public async Task<IActionResult> Create(LibroCreateDto libroCreateDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(libro);
-                await _context.SaveChangesAsync();
+                ServiceResult result = await _libroService.CreateLibroAsync(libroCreateDto);
+
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(libro);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Libroes/Edit/5
-        public async Task<IActionResult> Edit(long? id)
+        public async Task<IActionResult> Edit(long id)
         {
-            if (id == null)
+            ServiceResult result = await _libroService.GetLibroByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var libro = await _context.Libro.FindAsync(id);
-            if (libro == null)
-            {
-                return NotFound();
-            }
-            return View(libro);
+            return View(result.Data);
         }
 
         // POST: Libroes/Edit/5
@@ -81,72 +96,24 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, [Bind("ISBN,titulo,autor,editorial,anoPublicacion,categoria,numPaginas,cantidad,Status,IdLgOpLibro")] Libro libro)
+        public async Task<IActionResult> Edit(LibroUpdateDto libroUpdateDto)
         {
-            if (id != libro.ISBN)
+            try
             {
-                return NotFound();
-            }
+                ServiceResult result = await _libroService.UpdateLibroAsync(libroUpdateDto);
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (!result.Success)
                 {
-                    _context.Update(libro);
-                    await _context.SaveChangesAsync();
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!LibroExists(libro.ISBN))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(libro);
-        }
-
-        // GET: Libroes/Delete/5
-        public async Task<IActionResult> Delete(long? id)
-        {
-            if (id == null)
+            catch
             {
-                return NotFound();
+                return View();
             }
-
-            var libro = await _context.Libro
-                .FirstOrDefaultAsync(m => m.ISBN == id);
-            if (libro == null)
-            {
-                return NotFound();
-            }
-
-            return View(libro);
-        }
-
-        // POST: Libroes/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(long id)
-        {
-            var libro = await _context.Libro.FindAsync(id);
-            if (libro != null)
-            {
-                _context.Libro.Remove(libro);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool LibroExists(long id)
-        {
-            return _context.Libro.Any(e => e.ISBN == id);
         }
     }
 }

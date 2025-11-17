@@ -5,8 +5,6 @@ namespace SIGEBI.Application.Dtos.Configuration.AdminDtos
 {
     public record AdminCreateDto : UsuarioCreateDto
     {
-        public Status? AdminEstatus { get; set; } = Status.Activo;
-        public int? IdLgOpAdmin { get; set; }
 
     }
 }

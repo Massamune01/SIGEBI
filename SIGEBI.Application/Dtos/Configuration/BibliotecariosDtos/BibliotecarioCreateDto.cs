@@ -14,8 +14,6 @@ namespace SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos
         public int? TotalHorasTrabajadas { get; set; }
         public int? TotalClientesAtendidos { get; set; }
         public int? TotalPrestamos { get; set; }
-        public Status? BiblioEstatus { get; set; } = Status.Activo;
-        public int? IdLgOpBiblio { get; set; }
 
     }
 }

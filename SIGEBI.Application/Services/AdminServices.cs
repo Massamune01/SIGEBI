@@ -44,8 +44,7 @@ namespace SIGEBI.Application.Services
                     Edad = adminCreateDto.Edad,
                     Genero = adminCreateDto.Genero,
                     Email = adminCreateDto.Email,
-                    Nacimiento = adminCreateDto.Nacimiento,
-                    RolId = adminCreateDto.RolId
+                    Nacimiento = adminCreateDto.Nacimiento
                 };
 
                 var adminvalidation =await _Validator.Validate(adminDto,1);
@@ -61,12 +60,11 @@ namespace SIGEBI.Application.Services
                     Nombre = adminCreateDto.Nombre,
                     Apellido = adminCreateDto.Apellido,
                     Edad = adminCreateDto.Edad,
+                    Cedula = adminCreateDto.Cedula,
                     Genero = adminCreateDto.Genero,
                     Email = adminCreateDto.Email,
                     Nacimiento = adminCreateDto.Nacimiento,
-                    RolId = adminCreateDto.RolId,
-                    AdminEstatus = (adminCreateDto.AdminEstatus ?? Status.Activo),
-                    IdLgOpAdmin = adminCreateDto.IdLgOpAdmin
+                    RolId = 3
                 };
 
                 var oResultAdmin = await _adminRepository.Save(admin);
@@ -175,7 +173,7 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if(_cacheService.TryGet(cacheKey,out List<AdminDto> list))
+            if(_cacheService.TryGet(cacheKey,out List<Admin> list))
             {
                 result.Success = true;
                 result.Data = list;
@@ -188,8 +186,8 @@ namespace SIGEBI.Application.Services
                 
 
                 _logger.LogInformation("Retrieving all admins");
-                var existingAdminsResult =  _adminRepository.GetAll();
-                if (existingAdminsResult.Result.Data is null)
+                var existingAdminsResult =  await _adminRepository.GetAll();
+                if (existingAdminsResult.Data is null)
                 {
                     _logger.LogWarning("No admins found.");
                     result.Success = false;
@@ -197,10 +195,12 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
 
-                _cacheService.Set(cacheKey, existingAdminsResult.Result.Data);
+                List<Admin> admins = (List<Admin>)existingAdminsResult.Data;
+
+                _cacheService.Set(cacheKey, admins);
 
                 result.Success = true;
-                result.Data = existingAdminsResult.Result.Data;
+                result.Data = admins;
                 result.Message = "Admins retrieved successfully.";
                 _logger.LogInformation(result.Message);
             }
@@ -252,20 +252,14 @@ namespace SIGEBI.Application.Services
                     result.Message = "The admin data cannot be null.";
                     return result;
                 }
-                var oResultAdmin = await _adminRepository.GetEntityBy(adminUpdateDto.Id);
-                if(oResultAdmin is null)
-                {
-                    _logger.LogWarning("Admin not found with ID: {AdminId}", adminUpdateDto.Id);
-                    result.Success = false;
-                    result.Message = "Admin not found.";
-                    return result;
-                }
+
                 Admin admin = new Admin()
                 {
                     Id = adminUpdateDto.Id,
                     Nombre = adminUpdateDto.Nombre,
                     Apellido = adminUpdateDto.Apellido,
                     Edad = adminUpdateDto.Edad,
+                    Cedula = adminUpdateDto.Cedula,
                     Genero = adminUpdateDto.Genero,
                     Email = adminUpdateDto.Email,
                     Nacimiento = adminUpdateDto.Nacimiento,
@@ -276,7 +270,7 @@ namespace SIGEBI.Application.Services
 
                 var updateResult = await _adminRepository.Update(admin);
 
-                if (!updateResult.Success || updateResult.Data == null)
+                if (!updateResult.Success)
                 {
                     result.Success = false;
                     result.Message = "Failed to update the admin.";

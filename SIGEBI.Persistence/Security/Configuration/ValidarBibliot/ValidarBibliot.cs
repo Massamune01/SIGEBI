@@ -25,12 +25,6 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarBibliot
             if (!string.IsNullOrWhiteSpace(biblio.Apellido) && biblio.Apellido.Length > 80)
                 return new OperationResult { Success = false, Message = "El apellido no puede exceder 80 caracteres." };
 
-            // --- Cédula: opcional, sólo dígitos y longitud 7-15 ---
-            if (!string.IsNullOrWhiteSpace(biblio.Cedula))
-            {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(biblio.Cedula, @"^\d{7,15}$"))
-                    return new OperationResult { Success = false, Message = "La cédula debe contener sólo dígitos y tener entre 7 y 15 caracteres." };
-            }
 
             // --- Email: obligatorio, formato y longitud ---
             if (string.IsNullOrWhiteSpace(biblio.Email))

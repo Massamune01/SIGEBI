@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
 using SIGEBI.Persistence.Context;
 
@@ -9,95 +12,78 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class PrestamosController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly IPrestamosService _prestamosService;
 
-        public PrestamosController(SIGEBIContext context)
+        public PrestamosController(IPrestamosService prestamosService)
         {
-            _context = context;
+            _prestamosService = prestamosService;
         }
 
         // GET: api/Prestamos
         [HttpGet("GetAllPrest")]
         public async Task<ActionResult<IEnumerable<Prestamos>>> GetPrestamos()
         {
-            return await _context.Prestamos.ToListAsync();
+            ServiceResult result = await _prestamosService.GetAllPrestamosAsync();
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // GET: api/Prestamos/5
         [HttpGet("GetPrestById")]
         public async Task<ActionResult<Prestamos>> GetPrestamos(int id)
         {
-            var prestamos = await _context.Prestamos.FindAsync(id);
+            ServiceResult result = await _prestamosService.GetPrestamoByIdAsync(id);
 
-            if (prestamos == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            return prestamos;
+            return Ok(result);
         }
 
         // PUT: api/Prestamos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-prestamo")]
-        public async Task<IActionResult> PutPrestamos(int id, Prestamos prestamos)
+        public async Task<IActionResult> PutPrestamos(PrestamoUpdateDto prestamoUpdateDto)
         {
-            if (id != prestamos.Id)
-            {
-                return BadRequest();
-            }
+            ServiceResult result = await _prestamosService.UpdatePrestamoAsync(prestamoUpdateDto);
 
-            _context.Entry(prestamos).State = EntityState.Modified;
-
-            try
+            if (!result.Success)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(result.Message);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PrestamosExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/Prestamos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-prestamos")]
-        public async Task<ActionResult<Prestamos>> PostPrestamos(Prestamos prestamos)
+        public async Task<ActionResult<Prestamos>> PostPrestamos(PrestamoCreateDto prestamoCreateDto)
         {
-            _context.Prestamos.Add(prestamos);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _prestamosService.CreatePrestamoAsync(prestamoCreateDto);
 
-            return CreatedAtAction("GetPrestamos", new { id = prestamos.Id }, prestamos);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // DELETE: api/Prestamos/5
         [HttpDelete("remove-prestamo")]
         public async Task<IActionResult> DeletePrestamos(int id)
         {
-            var prestamos = await _context.Prestamos.FindAsync(id);
-            if (prestamos == null)
+            ServiceResult result = await _prestamosService.DeletePrestamoAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            _context.Prestamos.Remove(prestamos);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool PrestamosExists(int id)
-        {
-            return _context.Prestamos.Any(e => e.Id == id);
+            return Ok(result);
         }
     }
 }

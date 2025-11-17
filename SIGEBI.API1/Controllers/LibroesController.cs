@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.LibroDtos;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -14,95 +12,78 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class LibroesController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly ILibroService _libroService;
 
-        public LibroesController(SIGEBIContext context)
+        public LibroesController(ILibroService libroService)
         {
-            _context = context;
+            _libroService = libroService;
         }
 
         // GET: api/Libro
         [HttpGet("GetAllLibros")]
         public async Task<ActionResult<IEnumerable<Libro>>> GetLibros()
         {
-            return await _context.Libro.ToListAsync();
+            ServiceResult result = await _libroService.GetAllLibrosAsync();
+
+            if(!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // GET: api/Libro/5
         [HttpGet("GetLibroById")]
         public async Task<ActionResult<Libro>> GetLibro(Int64 id)
         {
-            var libro = await _context.Libro.FindAsync(id);
+            ServiceResult result = await _libroService.GetLibroByIdAsync(id);
 
-            if (libro == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            return libro;
+            return Ok(result);
         }
 
         // PUT: api/Libroes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-libro")]
-        public async Task<IActionResult> PutLibro(Int64 id, Libro libro)
+        public async Task<IActionResult> PutLibro(LibroUpdateDto libroUpdateDto)
         {
-            if (id != libro.ISBN)
-            {
-                return BadRequest();
-            }
+            ServiceResult result = await _libroService.UpdateLibroAsync(libroUpdateDto);
 
-            _context.Entry(libro).State = EntityState.Modified;
-
-            try
+            if (!result.Success)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(result.Message);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LibroExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/Libroes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-libro")]
-        public async Task<ActionResult<Libro>> PostLibro(Libro libro)
+        public async Task<ActionResult<Libro>> PostLibro(LibroCreateDto libroCreateDto)
         {
-            _context.Libro.Add(libro);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _libroService.CreateLibroAsync(libroCreateDto);
 
-            return CreatedAtAction("GetLibro", new { id = libro.ISBN }, libro);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // DELETE: api/Libroes/5
         [HttpDelete("remove-libro")]
         public async Task<IActionResult> DeleteLibro(Int64 id)
         {
-            var libro = await _context.Libro.FindAsync(id);
-            if (libro == null)
+            ServiceResult result = await _libroService.DeleteLibroAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            _context.Libro.Remove(libro);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool LibroExists(Int64 id)
-        {
-            return _context.Libro.Any(e => e.ISBN == id);
+            return Ok(result);
         }
     }
 }

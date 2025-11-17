@@ -40,11 +40,10 @@ namespace SIGEBI.Application.Services
                     Apellido = clienteCreateDto.Apellido,
                     Edad = clienteCreateDto.Edad,
                     Genero = clienteCreateDto.Genero,
+                    Cedula = clienteCreateDto.Cedula,
                     Email = clienteCreateDto.Email,
                     Nacimiento = clienteCreateDto.Nacimiento,
-                    RolId = clienteCreateDto.RolId,
                     CapacidadPrest = clienteCreateDto.CapacidadPrest ?? 0,
-                    StatusCliente = clienteCreateDto.StatusCliente,
                     TotalDevoluciones = clienteCreateDto.TotalDevoluciones ?? 0,
                     TotalDevolRestrasadas = clienteCreateDto.TotalDevolRestrasadas ?? 0,
                     TotalPrestamos = clienteCreateDto.TotalPrestamos ?? 0,
@@ -77,15 +76,14 @@ namespace SIGEBI.Application.Services
                     Edad = clienteCreateDto.Edad,
                     Genero = clienteCreateDto.Genero,
                     Email = clienteCreateDto.Email,
+                    Cedula = clienteCreateDto.Cedula,
                     Nacimiento = clienteCreateDto.Nacimiento,
-                    RolId = clienteCreateDto.RolId,
                     CapacidadPrest = clienteCreateDto.CapacidadPrest ?? 0,
                     StatusCliente = clienteCreateDto.StatusCliente,
                     TotalDevoluciones = clienteCreateDto.TotalDevoluciones ?? 0,
                     TotalDevolRestrasadas = clienteCreateDto.TotalDevolRestrasadas ?? 0,
                     TotalPrestamos = clienteCreateDto.TotalPrestamos ?? 0,
-                    PrestamosActivos = clienteCreateDto.PrestamosActivos ?? 0,
-                    IdLgOpCliente = clienteCreateDto.IdLgOpCliente ?? 0,
+                    PrestamosActivos = clienteCreateDto.PrestamosActivos ?? 0
                 };
 
                 var oClienteResult = await _clienteRepository.Save(cliente);
@@ -155,7 +153,7 @@ namespace SIGEBI.Application.Services
             ServiceResult result = new ServiceResult();
             const string cacheKey = "ALL_Clientes";
             _logger.LogInformation("Verifying existing cache with Key {cacheKey}", cacheKey);
-            if (_cacheService.TryGet(cacheKey, out List<ClienteDto> list))
+            if (_cacheService.TryGet(cacheKey, out List<Cliente> list))
             {
                 result.Success = true;
                 result.Data = list;
@@ -166,7 +164,7 @@ namespace SIGEBI.Application.Services
             {
                 _logger.LogInformation("Retrieving all clients.");
                 var oClienteResult = await _clienteRepository.GetAll();
-                if (oClienteResult is null)
+                if (oClienteResult.Data is null)
                 {
                     result.Success = false;
                     result.Message = "No clients found.";
@@ -174,10 +172,12 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
 
-                _cacheService.Set(cacheKey, oClienteResult.Data);
+                List<Cliente> clienteList = oClienteResult.Data;
+
+                _cacheService.Set(cacheKey, clienteList);
 
                 result.Success = true;
-                result.Data = oClienteResult.Data;
+                result.Data = clienteList;
                 result.Message = "Clients retrieved successfully.";
                 _logger.LogInformation(result.Message);
                 return result;
@@ -205,7 +205,7 @@ namespace SIGEBI.Application.Services
                     return result;
                 }
                 result.Success = true;
-                result.Data = oClienteResult;
+                result.Data = oClienteResult.FirstOrDefault();
                 result.Message = "Client retrieved successfully.";
                 _logger.LogInformation(result.Message);
                 return result;
@@ -235,6 +235,7 @@ namespace SIGEBI.Application.Services
                     Genero = clienteUpdateDto.Genero,
                     Email = clienteUpdateDto.Email,
                     Nacimiento = clienteUpdateDto.Nacimiento,
+                    Cedula = clienteUpdateDto.Cedula,
                     RolId = clienteUpdateDto.RolId,
                     CapacidadPrest = clienteUpdateDto.CapacidadPrest,
                     StatusCliente = clienteUpdateDto.StatusCliente,
@@ -260,15 +261,6 @@ namespace SIGEBI.Application.Services
                     _logger.LogWarning(result.Message);
                     return result;
                 }
-                var existingClienteResult = await _clienteRepository.GetClienteByIdAsync(clienteUpdateDto.Id);
-                if (existingClienteResult is null)
-                {
-                    result.Success = false;
-                    result.Message = "Client not found.";
-                    _logger.LogWarning(result.Message);
-                    return result;
-                }
-                var existingCliente = (Cliente?)existingClienteResult.FirstOrDefault();
 
                 Cliente cliente = new Cliente()
                 {

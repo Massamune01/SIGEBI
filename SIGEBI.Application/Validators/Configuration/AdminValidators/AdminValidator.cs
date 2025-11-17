@@ -72,9 +72,10 @@ namespace SIGEBI.Application.Validators.Configuration.AdminValidators
                     }
 
                     //Check if Cedula is already in use
-                    var existingCedula = _adminRepository.GetAdminByCedulaAsync(entity.Cedula).Result;
-                    bool boolCedula = existingCedula.FirstOrDefault().Cedula.Equals(entity.Cedula) ? true : false;
-                    if (boolCedula)
+                    var emailEncontrado = (await _adminRepository.GetAdminByCedulaAsync(entity.Cedula))
+                        .FirstOrDefault();
+
+                    if (emailEncontrado != null)
                     {
                         validationResult.AddError("Cedula is already in use.");
                     }
@@ -86,9 +87,9 @@ namespace SIGEBI.Application.Validators.Configuration.AdminValidators
                     }
 
                     // Check if email is already in use
-                    var existingEmail = _adminRepository.GetAdminByEmailAsync(entity.Email).Result;
-                    bool bollEmail = existingEmail.FirstOrDefault().Email.Equals(entity.Email);
-                    if (bollEmail)
+                    var existingEmail =( await _adminRepository.GetAdminByEmailAsync(entity.Email))
+                        .FirstOrDefault();
+                    if(existingEmail != null)
                     {
                         validationResult.AddError("Email is already in use.");
                     }
@@ -122,26 +123,10 @@ namespace SIGEBI.Application.Validators.Configuration.AdminValidators
                         validationResult.AddError("Cedula is required.");
                     }
 
-                    //Check if Cedula is already in use
-                    var existingCedula = _adminRepository.GetAdminByCedulaAsync(entity.Cedula).Result;
-                    bool boolCedula = existingCedula.FirstOrDefault().Cedula.Equals(entity.Cedula);
-                    if (existingCedula.FirstOrDefault() != null)
-                    {
-                        validationResult.AddError("Cedula is already in use.");
-                    }
-
                     // Check if Email is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Email))
                     {
                         validationResult.AddError("Email is required.");
-                    }
-
-                    // Check if email is already in use
-                    var existingEmail = _adminRepository.GetAdminByEmailAsync(entity.Email).Result;
-                    bool bollEmail = existingEmail.FirstOrDefault().Email.Equals(entity.Email);
-                    if (bollEmail)
-                    {
-                        validationResult.AddError("Email is already in use.");
                     }
 
                     return validationResult;

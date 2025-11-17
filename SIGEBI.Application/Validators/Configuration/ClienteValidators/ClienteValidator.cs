@@ -28,11 +28,6 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                 {
 
                     //Status is enum, it will always have a value, no need to check for null
-                    var statusValues = Enum.GetValues(typeof(Status?)).Cast<Status?>();
-                    if (!statusValues.Contains(entity.StatusCliente))
-                    {
-                        validationResult.AddError("Invalid status value.");
-                    }
 
                     // Check if Nombre is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Nombre))
@@ -74,7 +69,7 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
 
                     //Check if Cedula is already in use
                     var existingCedula = _clienteRepository.GetClienteByCedulaAsync(entity.Cedula).Result;
-                    if (existingCedula != null)
+                    if (existingCedula.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Cedula is already in use.");
                     }
@@ -87,7 +82,7 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
 
                     // Check if email is already in use
                     var existingEmail = _clienteRepository.GetClienteByEmail(entity.Email).Result;
-                    if (existingEmail != null)
+                    if (existingEmail.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Email is already in use.");
                     }
@@ -107,20 +102,6 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (entity.Nacimiento.HasValue && entity.Nacimiento == DateOnly.FromDateTime(DateTime.Now))
                     {
                         validationResult.AddError("Nacimiento cannot be today's date.");
-                    }
-
-                    // Check if email is already in use
-                    var existingEmail = _clienteRepository.GetClienteByEmail(entity.Email).Result;
-                    if (existingEmail != null)
-                    {
-                        validationResult.AddError("Email is already in use.");
-                    }
-
-                    //Check if Cedula is already in use
-                    var existingCedula = _clienteRepository.GetClienteByCedulaAsync(entity.Cedula).Result;
-                    if (existingCedula != null)
-                    {
-                        validationResult.AddError("Cedula is already in use.");
                     }
 
                     return validationResult;

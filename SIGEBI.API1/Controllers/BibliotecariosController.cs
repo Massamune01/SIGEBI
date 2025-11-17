@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
+using SIGEBI.Application.Interfaces;
+using SIGEBI.Application.Services;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Persistence.Context;
 
@@ -9,95 +13,83 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class BibliotecariosController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly IBibliotecarioService _bibliotecarioService;
 
-        public BibliotecariosController(SIGEBIContext context)
+        public BibliotecariosController(IBibliotecarioService bibliotecarioService)
         {
-            _context = context;
+            _bibliotecarioService = bibliotecarioService;
         }
 
         // GET: api/Bibliotecarios
         [HttpGet("GetAllBiblio")]
         public async Task<ActionResult<IEnumerable<Bibliotecarios>>> GetBibliotecarios()
         {
-            return await _context.Bibliotecarios.ToListAsync();
+            ServiceResult result = await _bibliotecarioService.GetAllBibliotecariosAsync();
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // GET: api/Bibliotecarios/5
         [HttpGet("GetBiblioById")]
         public async Task<ActionResult<Bibliotecarios>> GetBibliotecarios(int id)
         {
-            var bibliotecarios = await _context.Bibliotecarios.FindAsync(id);
+            ServiceResult result = await _bibliotecarioService.GetBibliotecarioByIdAsync(id);
 
-            if (bibliotecarios == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            return bibliotecarios;
+            return Ok(result);
         }
 
         // PUT: api/Bibliotecarios/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-Biblio")]
-        public async Task<IActionResult> PutBibliotecarios(int id, Bibliotecarios bibliotecarios)
+        public async Task<IActionResult> PutBibliotecarios(BibliotecarioUpdateDto bibliotecarioUpdateDto)
         {
-            if (id != bibliotecarios.Id)
+            ServiceResult result = await _bibliotecarioService.UpdateBibliotecarioAsync(bibliotecarioUpdateDto);
+
+            if (!result.Success)
             {
-                return BadRequest();
+                return BadRequest(result.Message);
             }
 
-            _context.Entry(bibliotecarios).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BibliotecariosExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/Bibliotecarios
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-biblio")]
-        public async Task<ActionResult<Bibliotecarios>> PostBibliotecarios(Bibliotecarios bibliotecarios)
+        public async Task<ActionResult<Bibliotecarios>> PostBibliotecarios(BibliotecarioCreateDto bibliotecarioCreateDto)
         {
-            _context.Bibliotecarios.Add(bibliotecarios);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _bibliotecarioService.CreateBibliotecarioAsync(bibliotecarioCreateDto);
 
-            return CreatedAtAction("GetBibliotecarios", new { id = bibliotecarios.Id }, bibliotecarios);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
         }
 
         // DELETE: api/Bibliotecarios/5
         [HttpDelete("remove-biblio")]
         public async Task<IActionResult> DeleteBibliotecarios(int id)
         {
-            var bibliotecarios = await _context.Bibliotecarios.FindAsync(id);
-            if (bibliotecarios == null)
+            ServiceResult result = await _bibliotecarioService.DeleteBibliotecarioAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
 
-            _context.Bibliotecarios.Remove(bibliotecarios);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool BibliotecariosExists(int id)
-        {
-            return _context.Bibliotecarios.Any(e => e.Id == id);
+            return Ok(result);
         }
     }
 }

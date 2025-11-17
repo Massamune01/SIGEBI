@@ -60,11 +60,6 @@ namespace SIGEBI.Application.Validators.Configuration.CredencialesValidators
                     {
                         validationResult.AddError("Usuario is required.");
                     }
-                    // Check if Password is not null or empty
-                    if (string.IsNullOrWhiteSpace(entity.PasswordHash))
-                    {
-                        validationResult.AddError("Password is required.");
-                    }
 
                     // Check if ClienteId exists in the database
                     var clienteExists = await _credencialesRepository.ClienteExist(entity.ClienteId);

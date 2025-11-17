@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Base;
 using SIGEBI.Persistence.Context;
 
@@ -9,95 +12,78 @@ namespace SIGEBI.Api.Controllers
     [ApiController]
     public class LogOperationsController : ControllerBase
     {
-        private readonly SIGEBIContext _context;
+        private readonly ILogOperationsService _logOperationsService;
 
-        public LogOperationsController(SIGEBIContext context)
+        public LogOperationsController(ILogOperationsService logOperationsService)
         {
-            _context = context;
+            _logOperationsService = logOperationsService;
         }
 
         // GET: api/LogOperations
         [HttpGet("GetAllLogOp")]
         public async Task<ActionResult<IEnumerable<LogOperations>>> GetLogOperations()
         {
-            return await _context.LogOperations.ToListAsync();
+            ServiceResult result = await _logOperationsService.GetAllLogOperationsAsync();
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // GET: api/LogOperations/5
         [HttpGet("GetLogOpById")]
         public async Task<ActionResult<LogOperations>> GetLogOperations(int id)
         {
-            var logOperations = await _context.LogOperations.FindAsync(id);
+            ServiceResult result = await _logOperationsService.GetLogOperationsByIdAsync(id);
 
-            if (logOperations == null)
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            return logOperations;
+            return Ok(result);
         }
 
         // PUT: api/LogOperations/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("update-LogOp")]
-        public async Task<IActionResult> PutLogOperations(int id, LogOperations logOperations)
+        public async Task<IActionResult> PutLogOperations(UpdateLogOperationDto logOperationUpdateDto)
         {
-            if (id != logOperations.IdOp)
-            {
-                return BadRequest();
-            }
+            ServiceResult result = await _logOperationsService.UpdateLogOperationsAsync(logOperationUpdateDto);
 
-            _context.Entry(logOperations).State = EntityState.Modified;
-
-            try
+            if (!result.Success)
             {
-                await _context.SaveChangesAsync();
+                return BadRequest(result.Message);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LogOperationsExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(result);
         }
 
         // POST: api/LogOperations
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("create-LogOp")]
-        public async Task<ActionResult<LogOperations>> PostLogOperations(LogOperations logOperations)
+        public async Task<ActionResult<LogOperations>> PostLogOperations(CreateLogOperationDto logOperationsCreateDto)
         {
-            _context.LogOperations.Add(logOperations);
-            await _context.SaveChangesAsync();
+            ServiceResult result = await _logOperationsService.CreateLogOperationsAsync(logOperationsCreateDto);
 
-            return CreatedAtAction("GetLogOperations", new { id = logOperations.IdOp }, logOperations);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         // DELETE: api/LogOperations/5
         [HttpDelete("remove-LogOp")]
         public async Task<IActionResult> DeleteLogOperations(int id)
         {
-            var logOperations = await _context.LogOperations.FindAsync(id);
-            if (logOperations == null)
+            ServiceResult result = await _logOperationsService.DeleteLogOperationsAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                return BadRequest(result.Message);
             }
-
-            _context.LogOperations.Remove(logOperations);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool LogOperationsExists(int id)
-        {
-            return _context.LogOperations.Any(e => e.IdOp == id);
+            return Ok(result);
         }
     }
 }
