@@ -38,11 +38,10 @@ namespace SIGEBI.Application.Services
                     titulo = libroCreateDto.titulo,
                     autor = libroCreateDto.autor,
                     editorial = libroCreateDto.editorial,
-                    anoPublicacion = libroCreateDto.anioPublicacion,
+                    anoPublicacion = libroCreateDto.anoPublicacion,
                     categoria = libroCreateDto.categoria,
                     numPaginas = libroCreateDto.numPaginas,
-                    cantidad = libroCreateDto.cantidad,
-                    IdLgOpLibro = libroCreateDto.IdLgOpLibro,
+                    cantidad = libroCreateDto.cantidad
                 };
 
                 var createValidator = await _Validator.Validate(libroDto,1);
@@ -69,14 +68,14 @@ namespace SIGEBI.Application.Services
                     titulo = libroCreateDto.titulo,
                     autor = libroCreateDto.autor,
                     editorial = libroCreateDto.editorial,
-                    anoPublicacion = libroCreateDto.anioPublicacion,
+                    anoPublicacion = libroCreateDto.anoPublicacion,
                     categoria = libroCreateDto.categoria,
                     numPaginas = libroCreateDto.numPaginas,
                     cantidad = libroCreateDto.cantidad,
-                    IdLgOpLibro = libroCreateDto.IdLgOpLibro,
-                    Status = libroCreateDto.Status
+                    IdLgOpLibro = 1,
+                    Status = Domain.Enums.Status.Activo
                 };
-                var createdLibro = _libroRepository.Save(libro);
+                var createdLibro = await _libroRepository.Save(libro);
                 if (createdLibro is null)
                 {
                     result.Success = false;

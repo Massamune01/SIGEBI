@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
@@ -12,10 +13,12 @@ namespace SIGEBI.Web.Controllers
     public class LogOperationsController : Controller
     {
         private readonly ILogOperationsService _logOperationsService;
+        private readonly IMapper _mapper;
 
-        public LogOperationsController(ILogOperationsService logOperationsService)
+        public LogOperationsController(ILogOperationsService logOperationsService, IMapper mapper)
         {
             _logOperationsService = logOperationsService;
+            _mapper = mapper;
         }
 
         // GET: LogOperations
@@ -29,7 +32,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            List<LogOperationsDto> logOperations = _mapper.Map<List<LogOperationsDto>>(result.Data);
+
+            return View(logOperations);
         }
 
         // GET: LogOperations/Details/5
@@ -43,7 +48,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            LogOperationsDto logOperationsDto = _mapper.Map<LogOperationsDto>(result.Data);
+
+            return View(logOperationsDto);
         }
 
         // GET: LogOperations/Create
@@ -88,7 +95,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            LogOperationsDto logOperationsDto = _mapper.Map<LogOperationsDto>(result.Data);
+
+            return View(logOperationsDto);
         }
 
         // POST: LogOperations/Edit/5

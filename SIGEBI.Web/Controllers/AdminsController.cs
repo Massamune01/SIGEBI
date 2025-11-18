@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
@@ -11,10 +12,14 @@ namespace SIGEBI.Web.Controllers
     public class AdminsController : Controller
     {
         private readonly IAdminService _adminService;
+        private readonly IMapper _mapper;
 
-        public AdminsController(IAdminService adminService)
+
+
+        public AdminsController(IAdminService adminService, IMapper mapper)
         {
             _adminService = adminService;
+            _mapper = mapper;
         }
 
         // GET: Admins
@@ -28,7 +33,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            List<AdminDto> adminDtos = _mapper.Map<List<AdminDto>>(result.Data);
+
+            return View(adminDtos);
         }
 
         // GET: Admins/Details/5
@@ -42,7 +49,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            AdminDto adminDto = _mapper.Map<AdminDto>(result.Data);
+
+            return View(adminDto);
         }
 
         // GET: Admins/Create
@@ -87,7 +96,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            AdminDto adminDto = _mapper.Map<AdminDto>(result.Data);
+
+            return View(adminDto);
         }
 
         // POST: Admins/Edit/5

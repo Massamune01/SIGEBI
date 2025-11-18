@@ -23,7 +23,7 @@ namespace SIGEBI.Application.Validators.Configuration.LibroValidators
             ValidationResult validationResult = new ValidationResult();
             try
             {
-                if (opcion == 1) // Create operation
+               if (opcion == 1) // Create operation
                 {
                     _logger.LogInformation("Validating Libro creation for ISBN: {ISBN}", entity.ISBN);
 
@@ -42,11 +42,6 @@ namespace SIGEBI.Application.Validators.Configuration.LibroValidators
                     if (string.IsNullOrWhiteSpace(entity.autor))
                     {
                         validationResult.AddError("Autor is required.");
-                    }
-                    // anoPublicacion should be a reasonable year
-                    if (entity.anoPublicacion < 1450 || entity.anoPublicacion > DateTime.Now.Year)
-                    {
-                        validationResult.AddError("AnoPublicacion must be between 1450 and the current year.");
                     }
                     // Check for unique ISBN
                     var existingLibros = await _libroRepository.GetLibroById(entity.ISBN);
@@ -81,11 +76,6 @@ namespace SIGEBI.Application.Validators.Configuration.LibroValidators
                     if (string.IsNullOrWhiteSpace(entity.autor))
                     {
                         validationResult.AddError("Autor is required.");
-                    }
-                    // anoPublicacion should be a reasonable year
-                    if (entity.anoPublicacion < 1450 || entity.anoPublicacion > DateTime.Now.Year)
-                    {
-                        validationResult.AddError("AnoPublicacion must be between 1450 and the current year.");
                     }
                     // Check if cantidad is non-negative
                     if (entity.numPaginas <= 0)

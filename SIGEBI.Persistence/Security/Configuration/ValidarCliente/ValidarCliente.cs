@@ -64,6 +64,14 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarCliente
                 return result;
             }
 
+            //Cedula
+            if(string.IsNullOrWhiteSpace(cliente.Cedula))
+            {
+                result.Success = false;
+                result.Message = "La cédula es obligatoria.";
+                return result;
+            }
+
             // Nacimiento
             if (cliente.Nacimiento == null)
             {

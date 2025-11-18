@@ -83,7 +83,8 @@ namespace SIGEBI.Application.Services
                     TotalDevoluciones = clienteCreateDto.TotalDevoluciones ?? 0,
                     TotalDevolRestrasadas = clienteCreateDto.TotalDevolRestrasadas ?? 0,
                     TotalPrestamos = clienteCreateDto.TotalPrestamos ?? 0,
-                    PrestamosActivos = clienteCreateDto.PrestamosActivos ?? 0
+                    PrestamosActivos = clienteCreateDto.PrestamosActivos ?? 0,
+                    RolId = 1
                 };
 
                 var oClienteResult = await _clienteRepository.Save(cliente);
@@ -270,6 +271,7 @@ namespace SIGEBI.Application.Services
                     Edad = clienteUpdateDto.Edad,
                     Genero = clienteUpdateDto.Genero,
                     Email = clienteUpdateDto.Email,
+                    Cedula = clienteUpdateDto.Cedula,
                     Nacimiento = clienteUpdateDto.Nacimiento,
                     RolId = clienteUpdateDto.RolId,
                     CapacidadPrest = clienteUpdateDto.CapacidadPrest,

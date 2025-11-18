@@ -1,4 +1,4 @@
-﻿@model SIGEBI.Domain.Entities.Configuration.Cliente
+﻿@model SIGEBI.Application.Dtos.Configuration.ClienteDtos.ClienteDto
 @using SIGEBI.Domain.Enums
 
 @{
@@ -49,11 +49,6 @@
                 <label asp-for="Nacimiento" class="control-label"></label>
                 <input asp-for="Nacimiento" class="form-control" />
                 <span asp-validation-for="Nacimiento" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RolId" class="control-label"></label>
-                <input asp-for="RolId" class="form-control" />
-                <span asp-validation-for="RolId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

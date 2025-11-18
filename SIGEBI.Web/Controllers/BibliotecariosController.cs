@@ -1,20 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Context;
 
 namespace SIGEBI.Web.Controllers
 {
     public class BibliotecariosController : Controller
     {
         private readonly IBibliotecarioService _bibliotecarioService;
+        private readonly IMapper _mapper;
 
-        public BibliotecariosController(IBibliotecarioService bibliotecarioService)
+        public BibliotecariosController(IBibliotecarioService bibliotecarioService, IMapper mapper)
         {
             _bibliotecarioService = bibliotecarioService;
+            _mapper = mapper;
         }
 
         // GET: Bibliotecarios
@@ -28,7 +28,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            List<BibliotecarioDto> bibliotecarioDtos = _mapper.Map<List<BibliotecarioDto>>(result.Data);
+
+            return View(bibliotecarioDtos);
         }
 
         // GET: Bibliotecarios/Details/5
@@ -42,7 +44,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            BibliotecarioDto bibliotecarioDto = _mapper.Map<BibliotecarioDto>(result.Data);
+
+            return View(bibliotecarioDto);
         }
 
         // GET: Bibliotecarios/Create
@@ -87,7 +91,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            BibliotecarioDto bibliotecarioDto = _mapper.Map<BibliotecarioDto>(result.Data);
+
+            return View(bibliotecarioDto);
         }
 
         // POST: Bibliotecarios/Edit/5

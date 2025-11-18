@@ -1,21 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Application.Services;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Context;
-
 namespace SIGEBI.Web.Controllers
 {
     public class LibroesController : Controller
     {
         private readonly ILibroService _libroService;
+        private readonly IMapper _mapper;
 
-        public LibroesController(ILibroService libroService)
+        public LibroesController(ILibroService libroService, IMapper mapper)
         {
             _libroService = libroService;
+            _mapper = mapper;
         }
 
         // GET: Libroes
@@ -29,7 +27,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            List<LibroDto> libroDtos = _mapper.Map<List<LibroDto>>(result.Data);
+
+            return View(libroDtos);
         }
 
         // GET: Libroes/Details/5
@@ -43,7 +43,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            LibroDto libroDto = _mapper.Map<LibroDto>(result.Data);
+
+            return View(libroDto);
         }
 
         // GET: Libroes/Create
@@ -88,7 +90,9 @@ namespace SIGEBI.Web.Controllers
                 return View();
             }
 
-            return View(result.Data);
+            LibroDto libroDto = _mapper.Map<LibroDto>(result.Data);
+
+            return View(libroDto);
         }
 
         // POST: Libroes/Edit/5

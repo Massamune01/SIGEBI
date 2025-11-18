@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Domain.Base;
 
 namespace SIGEBI.Application.Interfaces
 {
@@ -15,5 +16,6 @@ namespace SIGEBI.Application.Interfaces
         Task<ServiceResult> CreatePrestamoAsync(PrestamoCreateDto prestamoCreateDto);
         Task<ServiceResult> UpdatePrestamoAsync(PrestamoUpdateDto prestamoUpdateDto);
         Task<ServiceResult> DeletePrestamoAsync(int id);
+        Task<ServiceResult> GetLibroWithTituloAndISBN();
     }
 }

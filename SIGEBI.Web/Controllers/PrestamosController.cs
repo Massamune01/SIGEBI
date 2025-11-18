@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Base;
+using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Application.Interfaces;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Web.Models;
@@ -9,44 +13,52 @@ namespace SIGEBI.Web.Controllers
 {
     public class PrestamosController : Controller
     {
-        private readonly SIGEBIContext _context;
+        private readonly IPrestamosService _prestamoService;
+        private readonly IMapper _mapper;
 
-        public PrestamosController(SIGEBIContext context)
+        public PrestamosController(IPrestamosService prestamosService, IMapper mapper)
         {
-            _context = context;
+            _prestamoService = prestamosService;
+            _mapper = mapper;
         }
 
         // GET: Prestamos
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Prestamos.ToListAsync());
+            ServiceResult result = await _prestamoService.GetAllPrestamosAsync();
+
+            if(!result.Success)
+            {
+                ViewBag.ErrorMessage = result.Message;
+                return View();
+            }
+
+            List<PrestamoDto> prestamos = _mapper.Map<List<PrestamoDto>>(result.Data);
+
+            return View(prestamos);
         }
 
         // GET: Prestamos/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
+            ServiceResult result = await _prestamoService.GetPrestamoByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var prestamos = await _context.Prestamos
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (prestamos == null)
-            {
-                return NotFound();
-            }
+            PrestamoDto prestamoDto = _mapper.Map<PrestamoDto>(result.Data);
 
-            return View(prestamos);
+            return View(prestamoDto);
         }
 
         // GET: Prestamos/Create
         public IActionResult Create()
         {
 
-            var libros = _context.Libro
-           .Select(l => new { l.ISBN, l.titulo })
-           .ToList();
+            var libros = _prestamoService.GetLibroWithTituloAndISBN().Result.Data;
 
             ViewBag.Libros = libros;
 
@@ -58,31 +70,40 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,DatePrest,DateDevol,DateWasDevol,Status,IdLibros,IdCliente,IdLgOpPrest")] Prestamos prestamos)
+        public async Task<IActionResult> Create(PrestamoCreateDto prestamoCreateDto)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(prestamos);
-                await _context.SaveChangesAsync();
+                ServiceResult result = await _prestamoService.CreatePrestamoAsync(prestamoCreateDto);
+
+                if (!result.Success)
+                {
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(prestamos);
+            catch
+            {
+                return View();
+            }
         }
 
         // GET: Prestamos/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
+            ServiceResult result = await _prestamoService.GetPrestamoByIdAsync(id);
+
+            if (!result.Success)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = result.Message;
+                return View();
             }
 
-            var prestamos = await _context.Prestamos.FindAsync(id);
-            if (prestamos == null)
-            {
-                return NotFound();
-            }
-            return View(prestamos);
+            PrestamoDto prestamoDto = _mapper.Map<PrestamoDto>(result.Data);
+
+            return View(prestamoDto);
         }
 
         // POST: Prestamos/Edit/5
@@ -90,38 +111,24 @@ namespace SIGEBI.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,DatePrest,DateDevol,DateWasDevol,Status,IdLibros,IdCliente,IdLgOpPrest")] Prestamos prestamos)
+        public async Task<IActionResult> Edit(PrestamoUpdateDto prestamoUpdateDto)
         {
-            if (id != prestamos.Id)
+            try
             {
-                return NotFound();
-            }
+                ServiceResult result = await _prestamoService.UpdatePrestamoAsync(prestamoUpdateDto);
 
-            if (ModelState.IsValid)
-            {
-                try
+                if (!result.Success)
                 {
-                    _context.Update(prestamos);
-                    await _context.SaveChangesAsync();
+                    ViewBag.ErrorMessage = result.Message;
+                    return View();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PrestamosExists(prestamos.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(prestamos);
-        }
-        private bool PrestamosExists(int id)
-        {
-            return _context.Prestamos.Any(e => e.Id == id);
+            catch
+            {
+                return View();
+            }
         }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
-using SIGEBI.Domain.Base;
+﻿using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
 
 namespace SIGEBI.Persistence.Security.Configuration.ValidarPrestamos
@@ -50,30 +44,6 @@ namespace SIGEBI.Persistence.Security.Configuration.ValidarPrestamos
             {
                 result.Success = false;
                 result.Message = "La fecha de devolución debe ser posterior a la fecha de préstamo.";
-                return result;
-            }
-
-            // DateWasDevol (fecha real de devolución, opcional)
-            if (p.DateWasDevol.HasValue && p.DateWasDevol.Value < p.DatePrest)
-            {
-                result.Success = false;
-                result.Message = "La fecha real de devolución no puede ser anterior a la fecha de préstamo.";
-                return result;
-            }
-
-            // IdLibro
-            if (p.IdLibros <= 0)
-            {
-                result.Success = false;
-                result.Message = "Debe especificar un libro válido.";
-                return result;
-            }
-
-            // IdCliente
-            if (p.IdCliente <= 0)
-            {
-                result.Success = false;
-                result.Message = "Debe especificar un cliente válido.";
                 return result;
             }
 

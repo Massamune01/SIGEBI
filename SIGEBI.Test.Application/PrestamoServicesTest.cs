@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,6 +19,7 @@ namespace SIGEBI.Test.Application
     {
         private readonly IPrestamosService _prestamosServices;
         private readonly SIGEBIContext _context;
+        private readonly IMapper _mapper;
 
         public PrestamoServicesTest()
         {
@@ -29,8 +31,10 @@ namespace SIGEBI.Test.Application
             var IprestamosRepository = new Mock<IPrestamosRepository>();
             var validator = new Mock<IValidatorBase<PrestamoDto>>();
             var cacheservice = new Mock<ICacheService>();
+            var mapper = new Mock<IMapper>();
+            _mapper = mapper.Object;
             _context = new SIGEBIContext(options);
-            _prestamosServices = new PrestamosServices(IprestamosRepository.Object, loggerMock.Object, validator.Object, cacheservice.Object);
+            _prestamosServices = new PrestamosServices(IprestamosRepository.Object, loggerMock.Object, validator.Object, cacheservice.Object, _mapper);
         }
 
         [Fact]

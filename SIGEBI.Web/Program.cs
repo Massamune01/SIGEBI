@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SIGEBI.Application.Profiles;
 using SIGEBI.Domain.Interfaces.Cache;
 using SIGEBI.Infraestructure.Cache;
 using SIGEBI.Infraestructure.Data.Configuration;
@@ -30,6 +31,8 @@ namespace SIGEBI.Web
 
             // Add Dependency injection for CacheService
             builder.Services.AddSingleton<ICacheService, CacheLRUService>();
+
+            builder.Services.AddAutoMapper(cfg => { }, typeof(AdminProfile), typeof(BiblioProfile), typeof(ClienteProfile), typeof(LibroProfile), typeof(LogOpProfile), typeof(PrestamosProfile));
 
             //Adding Services Dependencies
             // Add dependency injection for Ef repositories

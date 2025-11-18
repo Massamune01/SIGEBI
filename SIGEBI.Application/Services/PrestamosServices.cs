@@ -1,9 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
+using SIGEBI.Domain.Base;
 using SIGEBI.Domain.Entities.Configuration.Prestamos;
 using SIGEBI.Domain.Interfaces.Cache;
 
@@ -15,14 +17,43 @@ namespace SIGEBI.Application.Services
         private readonly ILogger<PrestamosServices> _logger;
         private readonly IValidatorBase<PrestamoDto> _Validator;
         private readonly ICacheService _cacheService;
+        private readonly IMapper _mapper;
 
         public PrestamosServices(IPrestamosRepository prestamosRepository, ILogger<PrestamosServices> logger, 
-            IValidatorBase<PrestamoDto> validator, ICacheService cacheService)
+            IValidatorBase<PrestamoDto> validator, ICacheService cacheService, IMapper mapper)
         {
             _prestamosRepository = prestamosRepository;
             _logger = logger;
             _Validator = validator;
             _cacheService = cacheService;
+            _mapper = mapper;
+        }
+
+        public async Task<ServiceResult> GetLibroWithTituloAndISBN()
+        {
+            ServiceResult result = new ServiceResult();
+            try
+            {
+                _logger.LogInformation("Retrieving Libro with Titulo and ISBN");
+                var prestamos = await _prestamosRepository.GetLibroWithTituloAndISBN();
+                if (prestamos.Data is null)
+                {
+                    result.Success = false;
+                    result.Message = "No books found.";
+                    return result;
+                }
+                result.Success = true;
+                result.Data = prestamos.Data;
+                result.Message = "Books retrieved successfully.";
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.Success = false;
+                result.Message = "An error occurred while retrieving books.";
+                _logger.LogError(ex, result.Message);
+                return result;
+            }
         }
 
         public async Task<ServiceResult> CreatePrestamoAsync(PrestamoCreateDto prestamoCreateDto)
@@ -145,10 +176,13 @@ namespace SIGEBI.Application.Services
                     result.Message = "No loans found.";
                     return result;
                 }
+
+                List<PrestamoDto> prestamosList = _mapper.Map<List<PrestamoDto>>(prestamos.Data);
+
                 result.Success = true;
                 result.Data = prestamos.Data;
                 result.Message = "Loans retrieved successfully.";
-                _cacheService.Set(cacheKey, result.Data);
+                _cacheService.Set(cacheKey, prestamosList);
                 return result;
             }
             catch (Exception ex)
@@ -198,7 +232,7 @@ namespace SIGEBI.Application.Services
                 {
                     Id = prestamoUpdateDto.Id,
                     DateWasDevol = prestamoUpdateDto.DateWasDevol,
-                    Status = prestamoUpdateDto.PrestamosStatus
+                    Status = prestamoUpdateDto.Status
                 };
                 var prestamoValidation = await _Validator.Validate(prestamoDto,2);
 
@@ -216,23 +250,17 @@ namespace SIGEBI.Application.Services
                     result.Message = "The loan data cannot be null.";
                     return result;
                 }
-                var existingPrestamo = await _prestamosRepository.GetPrestamosById(prestamoUpdateDto.Id);
-                if (existingPrestamo is null)
-                {
-                    result.Success = false;
-                    result.Message = "Loan not found.";
-                    return result;
-                }
+
                 Prestamos prestamo = new Prestamos()
                 {
                     Id = prestamoUpdateDto.Id,
                     DateWasDevol = prestamoUpdateDto.DateWasDevol,
-                    Status = prestamoUpdateDto.PrestamosStatus,
-                    IdLibros = existingPrestamo.IdLibros,
-                    IdCliente = existingPrestamo.IdCliente,
-                    DatePrest = existingPrestamo.DatePrest,
-                    DateDevol = existingPrestamo.DateDevol,
-                    IdLgOpPrest = existingPrestamo.IdLgOpPrest
+                    Status = prestamoUpdateDto.Status,
+                    DatePrest = prestamoUpdateDto.DatePrest,
+                    DateDevol = prestamoUpdateDto.DateDevol,
+                    IdLibros = prestamoUpdateDto.IdLibros,
+                    IdCliente = prestamoUpdateDto.IdCliente,
+
                 };
                 var updatedPrestamo = await _prestamosRepository.Update(prestamo);
                 if (updatedPrestamo is null)

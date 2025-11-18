@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Numerics;
 using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Domain.Entities.Configuration
@@ -29,7 +28,7 @@ namespace SIGEBI.Domain.Entities.Configuration
 
         [Range(0, int.MaxValue, ErrorMessage = "Debe ingresar un número válido.")]
         public int cantidad { get; set; }
-        public Status Status { get; set; }  
+        public Status Status { get; set; } = Status.Activo;
         public int? IdLgOpLibro { get; set; }
     }
 }

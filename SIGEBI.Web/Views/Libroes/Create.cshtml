@@ -1,4 +1,4 @@
-﻿@model SIGEBI.Domain.Entities.Configuration.Libro
+﻿@model SIGEBI.Application.Dtos.Configuration.LibroDtos.LibroCreateDto
 
 @{
     ViewData["Title"] = "Create";
@@ -51,11 +51,6 @@
                 <label asp-for="cantidad" class="control-label"></label>
                 <input asp-for="cantidad" class="form-control" />
                 <span asp-validation-for="cantidad" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IdLgOpLibro" class="control-label"></label>
-                <input asp-for="IdLgOpLibro" class="form-control" />
-                <span asp-validation-for="IdLgOpLibro" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

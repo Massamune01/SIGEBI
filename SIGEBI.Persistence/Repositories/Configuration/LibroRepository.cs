@@ -81,6 +81,10 @@ namespace SIGEBI.Persistence.Repositories.Configuration
                 }
 
                 _logger.LogInformation("Saving Libro entity with ISBN: {ISBN}", entity.ISBN);
+                _logger.LogInformation("Valores del libro: " +
+                $"ISBN:{entity.ISBN}, Año:{entity.anoPublicacion}, " +
+                $"Cantidad:{entity.cantidad}, NumPaginas:{entity.numPaginas}, " +
+                $"Status:{entity.Status}, Op:{entity.IdLgOpLibro}");
                 await base.Save(entity);
                 await _context.SaveChangesAsync();
                 result.Data = entity;

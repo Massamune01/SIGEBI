@@ -1,17 +1,19 @@
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SIGEBI.Application.Profiles;
+using SIGEBI.Domain.Interfaces.Cache;
+using SIGEBI.Infraestructure.Cache;
 using SIGEBI.Infraestructure.Data.Configuration;
-using SIGEBI.Persistence.Context;
 using SIGEBI.Infraestructure.Dependencies.Admin;
 using SIGEBI.Infraestructure.Dependencies.Bibliotecario;
 using SIGEBI.Infraestructure.Dependencies.Cliente;
+using SIGEBI.Infraestructure.Dependencies.Credenciales;
 using SIGEBI.Infraestructure.Dependencies.Libro;
 using SIGEBI.Infraestructure.Dependencies.LogOperation;
 using SIGEBI.Infraestructure.Dependencies.Prestamo;
 using SIGEBI.Infraestructure.Dependencies.Roles;
-using SIGEBI.Infraestructure.Dependencies.Credenciales;
-using SIGEBI.Domain.Interfaces.Cache;
-using SIGEBI.Infraestructure.Cache;
+using SIGEBI.Persistence.Context;
 
 namespace SIGEBI.API1
 {
@@ -30,6 +32,8 @@ namespace SIGEBI.API1
 
             // Add Dependency injection for CacheService
             builder.Services.AddSingleton<ICacheService,  CacheLRUService>();
+
+            builder.Services.AddAutoMapper(cfg => { }, typeof(AdminProfile));
 
             //Adding Services Dependencies
             // Add dependency injection for Ef repositories

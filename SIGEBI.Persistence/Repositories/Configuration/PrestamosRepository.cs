@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Domain.Base;
@@ -19,6 +20,31 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         public PrestamosRepository(SIGEBIContext context, ILogger<PrestamosRepository> logger) : base(context)
         {
             _logger = logger;
+        }
+
+        public async Task<OperationResult> GetLibroWithTituloAndISBN()
+        {
+            var result = new OperationResult();
+
+            var libros = _context.Libro
+                    .Select(l => new LibroDto
+                    {
+                        ISBN = l.ISBN,
+                        titulo = l.titulo
+                        })
+                    .ToList();
+
+            if (libros == null)
+            {
+                result.Success = false;
+                result.Message = "No books found.";
+                _logger.LogWarning("No books found in the database.");
+                return result;
+            }
+
+            result.Data = libros;
+            result.Success = true;
+            return result;
         }
 
         // Get Libro by IdLibro to check availability by column cantidad
@@ -77,8 +103,21 @@ namespace SIGEBI.Persistence.Repositories.Configuration
         {
             _logger.LogInformation("Buscando préstamo con Id {Id}", id);
 
-            return await _context.Prestamos
-                .FirstOrDefaultAsync(p => p.Id == id && p.Status.ToString() == "Disponible");
+            try
+            {
+                _logger.LogInformation("Searching Prestamo with Id {Id}", id);
+                var prestamo = await _context.Prestamos
+                               .Where(p => p.Id == id)
+                               .ToListAsync();
+
+
+                return prestamo.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching Cliente with Id");
+                return new Prestamos();
+            }
         }
 
         public override async Task<OperationResult> Save(Prestamos entity)

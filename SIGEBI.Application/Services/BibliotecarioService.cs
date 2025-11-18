@@ -77,7 +77,8 @@ namespace SIGEBI.Application.Services
                     TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
                     TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
                     TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0
+                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
+                    RolId = 2, //Rol Bibliotecario
                 };
                 var createdBibliotecario = await _bibliotecariosRepository.Save(newBibliotecario);
                 if (createdBibliotecario is null)
@@ -245,6 +246,7 @@ namespace SIGEBI.Application.Services
                 _logger.LogInformation($"Updating bibliotecario with ID: {bibliotecarioUpdateDto.Id}");
                 Bibliotecarios oBibliotecarioResult = new Bibliotecarios()
                 {
+                    Id = bibliotecarioUpdateDto.Id,
                     Nombre = bibliotecarioUpdateDto.Nombre,
                     Apellido = bibliotecarioUpdateDto.Apellido,
                     Edad = bibliotecarioUpdateDto.Edad,

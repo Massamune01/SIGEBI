@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Base;
@@ -13,10 +14,12 @@ namespace SIGEBI.Web.Controllers
     public class ClientesController : Controller
     {
         private readonly IClienteService _clienteService;
+        private readonly IMapper _mapper;
 
-        public ClientesController(IClienteService clienteService)
+        public ClientesController(IClienteService clienteService, IMapper mapper)
         {
             _clienteService = clienteService;
+            _mapper = mapper;
         }
 
         // GET: Clientes
@@ -28,7 +31,10 @@ namespace SIGEBI.Web.Controllers
                 ViewBag.ErrorMessage = result.Message;
                 return View();
             }
-            return View(result.Data);
+
+            List<ClienteDto> clienteDtos = _mapper.Map<List<ClienteDto>>(result.Data);
+
+            return View(clienteDtos);
         }
 
         // GET: Clientes/Details/5
@@ -40,7 +46,10 @@ namespace SIGEBI.Web.Controllers
                 ViewBag.ErrorMessage = result.Message;
                 return View();
             }
-            return View(result.Data);
+
+            ClienteDto clienteDto = _mapper.Map<ClienteDto>(result.Data);
+
+            return View(clienteDto);
         }
 
         // GET: Clientes/Create
@@ -81,7 +90,10 @@ namespace SIGEBI.Web.Controllers
                 ViewBag.ErrorMessage = result.Message;
                 return View();
             }
-            return View(result.Data);
+
+            ClienteDto clienteDto = _mapper.Map<ClienteDto>(result.Data);
+
+            return View(clienteDto);
         }
 
         // POST: Clientes/Edit/5

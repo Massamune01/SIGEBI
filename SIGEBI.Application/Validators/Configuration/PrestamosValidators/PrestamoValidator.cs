@@ -48,10 +48,6 @@ namespace SIGEBI.Application.Validators.Configuration.PrestamosValidators
                     {
                         validationResult.AddError("Invalid Prestamo ID for update.");
                     }
-                    if(entity.DateDevol == default)
-                    {
-                        validationResult.AddError("DateDevol is required for update.");
-                    }
 
                     return validationResult;
                 }
@@ -63,7 +59,7 @@ namespace SIGEBI.Application.Validators.Configuration.PrestamosValidators
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred during PrestamoCreateDto validation.");
+                _logger.LogError(ex, "An error occurred during Prestamo validation.");
                 validationResult.AddError("An unexpected error occurred during validation.");
                 return validationResult;
             }
