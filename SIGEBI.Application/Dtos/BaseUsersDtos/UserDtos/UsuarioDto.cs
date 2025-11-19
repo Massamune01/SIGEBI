@@ -14,6 +14,6 @@ namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
         public Genero Genero { get; set; }
         public string? Email { get; set; }
         public DateOnly? Nacimiento { get; set; }
-        public int RolId { get; set; }
+        public int? RolId { get; set; }
     }
 }

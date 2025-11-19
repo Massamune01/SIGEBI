@@ -5,7 +5,6 @@ using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Domain.Enums;
 using SIGEBI.Domain.Interfaces.Cache;
 
 namespace SIGEBI.Application.Services

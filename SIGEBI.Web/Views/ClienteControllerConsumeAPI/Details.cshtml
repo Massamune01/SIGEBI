@@ -1,0 +1,108 @@
+﻿@model SIGEBI.Application.Dtos.Configuration.ClienteDtos.ClienteDto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Cliente</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Nombre
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nombre)
+        </dd>
+        <dt class="col-sm-2">
+            Apellido
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Apellido)
+        </dd>
+        <dt class="col-sm-2">
+            Cedula
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Cedula)
+        </dd>
+        <dt class="col-sm-2">
+            Edad
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Edad)
+        </dd>
+        <dt class="col-sm-2">
+            Genero
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Genero)
+        </dd>
+        <dt class="col-sm-2">
+            Email
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class="col-sm-2">
+            Nacimiento
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nacimiento)
+        </dd>
+        <dt class="col-sm-2">
+            RolId
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.RolId)
+        </dd>
+        <dt class="col-sm-2">
+            TotalDevoluciones
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalDevoluciones)
+        </dd>
+        <dt class="col-sm-2">
+            CapacidadPrest
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CapacidadPrest)
+        </dd>
+        <dt class="col-sm-2">
+            TotalDevolRestrasadas
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalDevolRestrasadas)
+        </dd>
+        <dt class="col-sm-2">
+            TotalPrestamos
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TotalPrestamos)
+        </dd>
+        <dt class="col-sm-2">
+            PrestamosActivos
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PrestamosActivos)
+        </dd>
+        <dt class="col-sm-2">
+            StatusCliente
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StatusCliente)
+        </dd>
+        <dt class="col-sm-2">
+            IdLgOpCliente
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdLgOpCliente)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

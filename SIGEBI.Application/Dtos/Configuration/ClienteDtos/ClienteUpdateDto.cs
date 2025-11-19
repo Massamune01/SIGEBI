@@ -16,5 +16,6 @@ namespace SIGEBI.Application.Dtos.Configuration.ClienteDtos
         public int TotalDevoluciones { get; set; } = 0;
         public int TotalPrestamos { get; set; } = 0;
         public Status StatusCliente { get; set; }
+        public int IdLgOpCliente { get; set; }
     }
 }

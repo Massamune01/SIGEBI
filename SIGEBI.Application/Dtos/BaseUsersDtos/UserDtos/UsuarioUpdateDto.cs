@@ -21,6 +21,5 @@ namespace SIGEBI.Application.Dtos.BaseDtos.UserDtos
         public string? Email { get; set; }
         public DateOnly? Nacimiento { get; set; }
         public int RolId { get; set; }
-        public virtual int? IdLgOp { get; set; }
     }
 }

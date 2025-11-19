@@ -2,7 +2,7 @@
 
 namespace SIGEBI.Web.Models
 {
-    public class PrestamosModel
+    public class PrestamosLibroListModel
     {
         public List<SelectListItem> LibrosDisponibles { get; set; }
     }

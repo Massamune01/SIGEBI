@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Persistence.Context;
 
 namespace SIGEBI.Web.Controllers
 {

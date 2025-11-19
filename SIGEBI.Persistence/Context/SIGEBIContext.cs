@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
+using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
+using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
 using SIGEBI.Domain.Base;
@@ -29,7 +31,9 @@ namespace SIGEBI.Persistence.Context
         public DbSet<RolCreateDto> RolCreateDto { get; set; }
         public DbSet<Libro> Libro { get; set; }
         public DbSet<Cliente> Cliente { get; set; }
+        public DbSet<ClienteDto> ClienteDto { get; set; }
         public DbSet<Bibliotecarios> Bibliotecarios { get; set; }
+        public DbSet<BibliotecarioDto> BibliotecariosDto { get; set; }
         public DbSet<Prestamos> Prestamos { get; set; }
         public DbSet<Admin> Admin { get; set; }
         public DbSet<AdminDto> AdminDto { get; set; }

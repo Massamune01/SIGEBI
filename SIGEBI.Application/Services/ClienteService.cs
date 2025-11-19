@@ -274,6 +274,7 @@ namespace SIGEBI.Application.Services
                     Cedula = clienteUpdateDto.Cedula,
                     Nacimiento = clienteUpdateDto.Nacimiento,
                     RolId = clienteUpdateDto.RolId,
+                    IdLgOpCliente = clienteUpdateDto.IdLgOpCliente,
                     CapacidadPrest = clienteUpdateDto.CapacidadPrest,
                     StatusCliente = clienteUpdateDto.StatusCliente,
                     TotalDevoluciones = clienteUpdateDto.TotalDevoluciones,
