@@ -1,0 +1,60 @@
+﻿@model SIGEBI.Application.Dtos.Configuration.PrestamosDtos.PrestamoDto
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Prestamos</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            IdLibros
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdLibros)
+        </dd>
+        <dt class="col-sm-2">
+            IdCliente
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdCliente)
+        </dd>
+        <dt class="col-sm-2">
+            IdLgOpPrest
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IdLgOpPrest)
+        </dd>
+        <dt class="col-sm-2">
+            DatePrest
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DatePrest)
+        </dd>
+        <dt class="col-sm-2">
+            DateDevol
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateDevol)
+        </dd>
+        <dt class="col-sm-2">
+            DateWasDevol
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateWasDevol)
+        </dd>
+        <dt class="col-sm-2">
+            Status
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

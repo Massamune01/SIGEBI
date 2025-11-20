@@ -1,0 +1,77 @@
+﻿@model IEnumerable<SIGEBI.Application.Dtos.Configuration.LogOperationsDtos.LogOperationsDto>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Auditoria</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IdOp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Entity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fecha)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeOperation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Descripcion)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastUpdateBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdateBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StatusOp)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IdOp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Entity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Fecha)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TypeOperation)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descripcion)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LastUpdateBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdateBy)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StatusOp)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdOp">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdOp">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

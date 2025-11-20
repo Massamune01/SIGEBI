@@ -1,22 +1,23 @@
 ﻿using System.Text.Json;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
-using SIGEBI.Web.ViewModels.Crede;
+using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Web.ViewModels.Prestamo;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
-    public class CredeControllerConsumeAPI : Controller
+    public class PrestamoControllerConsumeAPI : Controller
     {
-        // GET: CredeControllerConsumeAPI
+        // GET: PrestamoControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
-            GetAllCredeResponse getAllCredeResponse = null;
+            GetAllPrestamoResponse getAllPrestamoResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (var client =  new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Credenciales/GetCredenciales");
+                    var response =  await client.GetAsync("Prestamos/GetAllPrest");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -24,40 +25,39 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllCredeResponse = JsonSerializer.Deserialize<GetAllCredeResponse>(responseString, options);
+                        getAllPrestamoResponse = JsonSerializer.Deserialize<GetAllPrestamoResponse>(responseString, options);
                     }
                     else
                     {
-                        getAllCredeResponse = new GetAllCredeResponse
+                        getAllPrestamoResponse = new GetAllPrestamoResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
-                getAllCredeResponse = new GetAllCredeResponse
+                getAllPrestamoResponse = new GetAllPrestamoResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getAllCredeResponse.Data);
+            return View(getAllPrestamoResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Details/5
+        // GET: PrestamoControllerConsumeAPI/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetPrestamoResponse getPrestamoResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"Prestamos/GetPrestById?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -65,68 +65,67 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getPrestamoResponse = JsonSerializer.Deserialize<GetPrestamoResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getPrestamoResponse = new GetPrestamoResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getPrestamoResponse = new GetPrestamoResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getCredeResponse.Data);
+            return View(getPrestamoResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Create
+        // GET: PrestamoControllerConsumeAPI/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Create
+        // POST: PrestamoControllerConsumeAPI/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CredencialesCreateDto model)
+        public async Task<IActionResult> Create(PrestamoCreateDto model)
         {
-            CredencialesCreateDto createResponse = null;
+            PrestamoCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (var client= new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PostAsJsonAsync("Credenciales/create-credenciales", model);
+                    var response =  await client.PostAsJsonAsync("Prestamos/create-prestamos", model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
-                        };
+                        };  
                         var responseString = await response.Content.ReadAsStringAsync();
-                        createResponse = JsonSerializer.Deserialize<CredencialesCreateDto>(responseString, options);
-                        if(createResponse != null)
+                        createResponse = JsonSerializer.Deserialize<PrestamoCreateDto>(responseString, options);
+                        if (createResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales created successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be update";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be created";
+                            TempData["SuccessMessage"] = "Admin successfully updated";
                         }
                     }
                     else
                     {
-                        ViewBag.Error = "Error al consumir la API";
+                        ViewBag.ErrorMessage = "Error al consumir la API";
                     }
                 }
                 return RedirectToAction(nameof(Index));
@@ -137,16 +136,16 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Edit/5
+        // GET: PrestamoControllerConsumeAPI/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetPrestamoResponse getPrestamoResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"Prestamos/GetPrestById?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -154,42 +153,41 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getPrestamoResponse = JsonSerializer.Deserialize<GetPrestamoResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getPrestamoResponse = new GetPrestamoResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getPrestamoResponse = new GetPrestamoResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getCredeResponse.Data);
+            return View(getPrestamoResponse.Data);
         }
 
-        // POST: CredeControllerConsumeAPI/Edit/5
+        // POST: PrestamoControllerConsumeAPI/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CredencialesUpdateDto model)
+        public async Task<IActionResult> Edit(PrestamoUpdateDto model)
         {
-            CredencialesUpdateDto updateResponse = null;
+            PrestamoUpdateDto updateResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Credenciales/update-credenciales", model);
+                    var response = await client.PutAsJsonAsync("Prestamos/update-prestamo", model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -197,19 +195,19 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        updateResponse = JsonSerializer.Deserialize<CredencialesUpdateDto>(responseString, options);
-                        if (updateResponse != null)
+                        updateResponse = JsonSerializer.Deserialize<PrestamoUpdateDto>(responseString, options);
+                        if (updateResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales updated successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be update";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be updated";
+                            TempData["SuccessMessage"] = "Admin successfully updated";
                         }
                     }
                     else
                     {
-                        ViewBag.Error = "Error al consumir la API";
+                        ViewBag.ErrorMessage = "Error al consumir la API";
                     }
                 }
                 return RedirectToAction(nameof(Index));
@@ -220,13 +218,13 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Delete/5
+        // GET: PrestamoControllerConsumeAPI/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Delete/5
+        // POST: PrestamoControllerConsumeAPI/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

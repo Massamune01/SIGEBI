@@ -207,7 +207,7 @@ namespace SIGEBI.Persistence.Repositories.Configuration
             {
                 _logger.LogError(ex, "Error Updating Prestamo entity.");
                 result.Success = false;
-                result.Message = "Error Updating Prestamo entity.";
+                result.Message = $"Error Updating Prestamo entity: {ex}";
             }
             return result;
         }

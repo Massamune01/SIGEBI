@@ -1,22 +1,22 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
-using SIGEBI.Web.ViewModels.Crede;
+using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
+using SIGEBI.Web.ViewModels.LogOp;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
-    public class CredeControllerConsumeAPI : Controller
+    public class LogOpControllerConsumeAPI : Controller
     {
-        // GET: CredeControllerConsumeAPI
+        // GET: LogOpControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
-            GetAllCredeResponse getAllCredeResponse = null;
+            GetAllLogOpResponse getAllLogOpResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Credenciales/GetCredenciales");
+                    var response = await client.GetAsync("LogOperations/GetAllLogOp");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -24,40 +24,41 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllCredeResponse = JsonSerializer.Deserialize<GetAllCredeResponse>(responseString, options);
+                        getAllLogOpResponse = JsonSerializer.Deserialize<GetAllLogOpResponse>(responseString, options);
                     }
                     else
                     {
-                        getAllCredeResponse = new GetAllCredeResponse
+                        getAllLogOpResponse = new GetAllLogOpResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
-            catch (Exception ex)
+            catch( Exception ex)
             {
-                getAllCredeResponse = new GetAllCredeResponse
+                getAllLogOpResponse = new GetAllLogOpResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
+                ViewBag.ErrorMessage = getAllLogOpResponse.Message;
+                return View();
             }
-            return View(getAllCredeResponse.Data);
+            return View(getAllLogOpResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Details/5
+        // GET: LogOpControllerConsumeAPI/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetLogOpResponse getLogOpResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"LogOperations/GetLogOpById?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -65,48 +66,50 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getLogOpResponse = JsonSerializer.Deserialize<GetLogOpResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getLogOpResponse = new GetLogOpResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getLogOpResponse = new GetLogOpResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
+                ViewBag.ErrorMessage = getLogOpResponse.Message;
+                return View();
             }
-            return View(getCredeResponse.Data);
+            return View(getLogOpResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Create
+        // GET: LogOpControllerConsumeAPI/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Create
+        // POST: LogOpControllerConsumeAPI/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CredencialesCreateDto model)
+        public async Task<IActionResult> Create(CreateLogOperationDto model)
         {
-            CredencialesCreateDto createResponse = null;
+            CreateLogOperationDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using(var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PostAsJsonAsync("Credenciales/create-credenciales", model);
+                    var response =  await client.PostAsJsonAsync("LogOperations/create-LogOp", model);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -114,14 +117,15 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        createResponse = JsonSerializer.Deserialize<CredencialesCreateDto>(responseString, options);
-                        if(createResponse != null)
+                        createResponse = JsonSerializer.Deserialize<CreateLogOperationDto>(responseString, options);
+
+                        if (createResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales created successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be update";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be created";
+                            TempData["SuccessMessage"] = "Admin successfully updated";
                         }
                     }
                     else
@@ -137,16 +141,16 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Edit/5
+        // GET: LogOpControllerConsumeAPI/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetLogOpResponse getLogOpResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"LogOperations/GetLogOpById?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -154,42 +158,44 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getLogOpResponse = JsonSerializer.Deserialize<GetLogOpResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getLogOpResponse = new GetLogOpResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getLogOpResponse = new GetLogOpResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
+                ViewBag.ErrorMessage = getLogOpResponse.Message;
+                return View();
             }
-            return View(getCredeResponse.Data);
+            return View(getLogOpResponse.Data);
         }
 
-        // POST: CredeControllerConsumeAPI/Edit/5
+        // POST: LogOpControllerConsumeAPI/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CredencialesUpdateDto model)
+        public async Task<IActionResult> Edit(UpdateLogOperationDto model)
         {
-            CredencialesUpdateDto updateResponse = null;
+            UpdateLogOperationDto updateResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Credenciales/update-credenciales", model);
+                    var response = await client.PutAsJsonAsync("LogOperations/update-LogOp", model);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -197,14 +203,15 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        updateResponse = JsonSerializer.Deserialize<CredencialesUpdateDto>(responseString, options);
-                        if (updateResponse != null)
+                        updateResponse = JsonSerializer.Deserialize<UpdateLogOperationDto>(responseString, options);
+
+                        if (updateResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales updated successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be update";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be updated";
+                            TempData["SuccessMessage"] = "Admin successfully updated";
                         }
                     }
                     else
@@ -220,13 +227,13 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Delete/5
+        // GET: LogOpControllerConsumeAPI/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Delete/5
+        // POST: LogOpControllerConsumeAPI/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)

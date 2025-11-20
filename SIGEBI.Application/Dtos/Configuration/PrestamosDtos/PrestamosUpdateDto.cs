@@ -11,5 +11,6 @@ namespace SIGEBI.Application.Dtos.Configuration.PrestamosDtos
         public Status Status { get; set; }
         public Int64 IdLibros { get; set; }
         public int IdCliente { get; set; }
+        public int? IdLgOpPrest { get; set; }
     }
 }

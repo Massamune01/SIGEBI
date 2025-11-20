@@ -260,6 +260,7 @@ namespace SIGEBI.Application.Services
                     DateDevol = prestamoUpdateDto.DateDevol,
                     IdLibros = prestamoUpdateDto.IdLibros,
                     IdCliente = prestamoUpdateDto.IdCliente,
+                    IdLgOpPrest = prestamoUpdateDto.IdLgOpPrest
 
                 };
                 var updatedPrestamo = await _prestamosRepository.Update(prestamo);

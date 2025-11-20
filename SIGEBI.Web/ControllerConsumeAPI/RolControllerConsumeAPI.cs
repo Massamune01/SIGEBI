@@ -1,112 +1,114 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
-using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
-using SIGEBI.Web.ViewModels.Crede;
+using SIGEBI.Application.Dtos.Configuration.RolDtos;
+using SIGEBI.Web.ViewModels.Roles;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
-    public class CredeControllerConsumeAPI : Controller
+    public class RolControllerConsumeAPI : Controller
     {
-        // GET: CredeControllerConsumeAPI
+        // GET: RolControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
-            GetAllCredeResponse getAllCredeResponse = null;
+            GetAllRolesResponse getAllRolesResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Credenciales/GetCredenciales");
+                    var response = await client.GetAsync("Rol/GetRoles");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
                         };
+
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getAllCredeResponse = JsonSerializer.Deserialize<GetAllCredeResponse>(responseString, options);
+                        getAllRolesResponse = JsonSerializer.Deserialize<GetAllRolesResponse>(responseString, options);
                     }
                     else
                     {
-                        getAllCredeResponse = new GetAllCredeResponse
+                        getAllRolesResponse = new GetAllRolesResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getAllCredeResponse = new GetAllCredeResponse
+                getAllRolesResponse = new GetAllRolesResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getAllCredeResponse.Data);
+            return View(getAllRolesResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Details/5
+        // GET: RolControllerConsumeAPI/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetRolesResponse getRolesResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"Rol/GetEntityByID?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
                         };
+
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getRolesResponse = JsonSerializer.Deserialize<GetRolesResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getRolesResponse = new GetRolesResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getRolesResponse = new GetRolesResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getCredeResponse.Data);
+            return View(getRolesResponse.Data);
         }
 
-        // GET: CredeControllerConsumeAPI/Create
+        // GET: RolControllerConsumeAPI/Create
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Create
+        // POST: RolControllerConsumeAPI/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(CredencialesCreateDto model)
+        public async Task<IActionResult> Create(RolCreateDto model)
         {
-            CredencialesCreateDto createResponse = null;
+            RolCreateDto createResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PostAsJsonAsync("Credenciales/create-credenciales", model);
+
+                    var response = await client.PostAsJsonAsync("Rol/create-rol", model);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -114,14 +116,15 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        createResponse = JsonSerializer.Deserialize<CredencialesCreateDto>(responseString, options);
-                        if(createResponse != null)
+                        createResponse = JsonSerializer.Deserialize<RolCreateDto>(responseString, options);
+
+                        if (createResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales created successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be created";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be created";
+                            TempData["SuccessMessage"] = "Admin successfully created";
                         }
                     }
                     else
@@ -129,6 +132,7 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -137,59 +141,61 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Edit/5
+        // GET: RolControllerConsumeAPI/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            GetCredeResponse getCredeResponse = null;
+            GetRolesResponse getRolesResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await client.GetAsync($"Rol/GetEntityByID?id={id}");
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
                         };
+
                         var responseString = await response.Content.ReadAsStringAsync();
-                        getCredeResponse = JsonSerializer.Deserialize<GetCredeResponse>(responseString, options);
+                        getRolesResponse = JsonSerializer.Deserialize<GetRolesResponse>(responseString, options);
                     }
                     else
                     {
-                        getCredeResponse = new GetCredeResponse
+                        getRolesResponse = new GetRolesResponse
                         {
                             Success = false,
                             Message = "Error al consumir la API"
                         };
-
                     }
                 }
             }
             catch (Exception ex)
             {
-                getCredeResponse = new GetCredeResponse
+                getRolesResponse = new GetRolesResponse
                 {
                     Success = false,
                     Message = $"Error al consumir la API {ex.Message}"
                 };
             }
-            return View(getCredeResponse.Data);
+            return View(getRolesResponse.Data);
         }
 
-        // POST: CredeControllerConsumeAPI/Edit/5
+        // POST: RolControllerConsumeAPI/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(CredencialesUpdateDto model)
+        public async Task<IActionResult> Edit(RolUpdateDto model)
         {
-            CredencialesUpdateDto updateResponse = null;
+            RolUpdateDto updateResponse = null;
             try
             {
                 using (var client = new HttpClient())
                 {
                     client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Credenciales/update-credenciales", model);
+
+                    var response = await client.PutAsJsonAsync("Rol/update-rol", model);
+
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -197,14 +203,15 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                             PropertyNameCaseInsensitive = true
                         };
                         var responseString = await response.Content.ReadAsStringAsync();
-                        updateResponse = JsonSerializer.Deserialize<CredencialesUpdateDto>(responseString, options);
-                        if (updateResponse != null)
+                        updateResponse = JsonSerializer.Deserialize<RolUpdateDto>(responseString, options);
+
+                        if (updateResponse is null)
                         {
-                            TempData["SuccessMessage"] = "Credenciales updated successfully";
+                            TempData["ErrorMessage"] = "Admin cannot be update";
                         }
                         else
                         {
-                            TempData["ErrorMessage"] = "Credenciales cannot be updated";
+                            TempData["SuccessMessage"] = "Admin successfully updated";
                         }
                     }
                     else
@@ -212,6 +219,7 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
+
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -220,13 +228,13 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             }
         }
 
-        // GET: CredeControllerConsumeAPI/Delete/5
+        // GET: RolControllerConsumeAPI/Delete/5
         public ActionResult Delete(int id)
         {
             return View();
         }
 
-        // POST: CredeControllerConsumeAPI/Delete/5
+        // POST: RolControllerConsumeAPI/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
