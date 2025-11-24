@@ -1,11 +1,7 @@
-﻿using Castle.Core.Logging;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SIGEBI.Application.Base;
-using SIGEBI.Application.Dtos.Configuration.AdminDtos;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Application.Repositories.Configuration;
-using SIGEBI.Application.Validators.Base;
 using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Interfaces.Cache;
 
@@ -14,128 +10,56 @@ namespace SIGEBI.Application.Services
     public class BibliotecarioService : IBibliotecarioService
     {
         private readonly ILogger<BibliotecarioService> _logger;
-        private readonly IBibliotecariosRepository _bibliotecariosRepository;
-        private readonly IValidatorBase<BibliotecarioDto> _Validator;
+        private readonly IBibliotecarioFacade _bibliotecarioFacade;
         private readonly ICacheService _cacheService;
 
-        public BibliotecarioService(ILogger<BibliotecarioService> logger, IBibliotecariosRepository bibliotecariosRepository, 
-            IValidatorBase<BibliotecarioDto> validator, ICacheService cacheService)
+        public BibliotecarioService(IBibliotecarioFacade biblioFacade,
+            ILogger<BibliotecarioService> logger, 
+            ICacheService cacheService)
         {
             _logger = logger;
-            _bibliotecariosRepository = bibliotecariosRepository;
-            _Validator = validator;
+            _bibliotecarioFacade = biblioFacade;
             _cacheService = cacheService;
         }
 
         public async Task<ServiceResult> CreateBibliotecarioAsync(BibliotecarioCreateDto bibliotecarioCreateDto)
         {
             ServiceResult result = new ServiceResult();
-            try
-            {
-                //Validaciones de negocio
-                _logger.LogInformation("Validating bibliotecario");
-                BibliotecarioDto bibliotecarioDto = new BibliotecarioDto()
-                {
-                    Nombre = bibliotecarioCreateDto.Nombre,
-                    Apellido = bibliotecarioCreateDto.Apellido,
-                    Edad = bibliotecarioCreateDto.Edad,
-                    Genero = bibliotecarioCreateDto.Genero,
-                    Email = bibliotecarioCreateDto.Email,
-                    Cedula = bibliotecarioCreateDto.Cedula,
-                    Nacimiento = bibliotecarioCreateDto.Nacimiento,
-                    TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
-                    TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
-                    TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
-                }; 
 
-                var createvalidator = await _Validator.Validate(bibliotecarioDto,1);
-                if (!createvalidator.IsValid)
-                {
-                    result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", createvalidator.Errors);
-                    return result;
-                }
-
-
-                _logger.LogInformation("Creating a bibliotecario");
-                if (bibliotecarioCreateDto is null)
-                {
-                    result.Success = false;
-                    result.Message = "The bibliotecario data cannot be null.";
-                    return result;
-                }
-                Bibliotecarios newBibliotecario = new Bibliotecarios()
-                {
-                    Nombre = bibliotecarioCreateDto.Nombre,
-                    Apellido = bibliotecarioCreateDto.Apellido,
-                    Edad = bibliotecarioCreateDto.Edad,
-                    Genero = bibliotecarioCreateDto.Genero,
-                    Email = bibliotecarioCreateDto.Email,
-                    Nacimiento = bibliotecarioCreateDto.Nacimiento,
-                    Cedula = bibliotecarioCreateDto.Cedula,
-                    TotalDevoluciones = bibliotecarioCreateDto.TotalDevoluciones ?? 0,
-                    TotalHorasTrabajadas = bibliotecarioCreateDto.TotalHorasTrabajadas ?? 0,
-                    TotalClientesAtendidos = bibliotecarioCreateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioCreateDto.TotalPrestamos ?? 0,
-                    RolId = 2, //Rol Bibliotecario
-                };
-                var createdBibliotecario = await _bibliotecariosRepository.Save(newBibliotecario);
-                if (createdBibliotecario is null)
-                {
-                    result.Success = false;
-                    result.Message = "Failed to create bibliotecario.";
-                    return result;
-                }
-                result.Success = true;
-                result.Data = createdBibliotecario;
-                result.Message = "Bibliotecario created successfully.";
-                _logger.LogInformation(result.Message);
-                _cacheService.ClearKeys();
-            }
-            catch (Exception ex)
+            _logger.LogInformation("Creating Bibliotecario.");
+            var biblioResult = await _bibliotecarioFacade.CreateBibliotecarioAsync(bibliotecarioCreateDto);
+            if (!biblioResult.Success)
             {
                 result.Success = false;
-                result.Message = "An error occurred while creating the bibliotecario.";
-                _logger.LogError(ex, result.Message);
+                result.Message = biblioResult.Message;
+                _logger.LogError($"Error creating a Bibliotecario: {result.Message}");
             }
+            result.Success = true;
+            result.Data = biblioResult.Data;
+            result.Message = biblioResult.Message;
+            _logger.LogInformation(result.Message);
+            _cacheService.ClearKeys();
             return result;
         }
 
         public async Task<ServiceResult> DeleteBibliotecarioAsync(int id)
         {
             ServiceResult result = new ServiceResult();
-            try
-            {
-                _logger.LogInformation($"Deleting bibliotecario with ID: {id}");
-                var existingBibliotecarioResult = await _bibliotecariosRepository.GetBiblioById(id);
-                if (existingBibliotecarioResult is null)
-                {
-                    result.Success = false;
-                    result.Message = "Bibliotecario not found.";
-                    return result;
-                }
+            _logger.LogInformation($"Deleting bibliotecario with ID: {id}");
 
-                var oBibliotecarioResult = (Bibliotecarios?)existingBibliotecarioResult.FirstOrDefault();
+            var biblioResult = await _bibliotecarioFacade.DeleteBibliotecarioAsync(id);
 
-                var deleteResult = await _bibliotecariosRepository.Remove(oBibliotecarioResult);
-                if (!deleteResult.Success)
-                {
-                    result.Success = false;
-                    result.Message = "Failed to delete the bibliotecario.";
-                    return result;
-                }
-                result.Success = true;
-                result.Message = "Bibliotecario deleted successfully.";
-                _logger.LogInformation(result.Message);
-                _cacheService.ClearKeys();
-            }
-            catch (Exception ex)
+            if (!biblioResult.Success)
             {
                 result.Success = false;
-                result.Message = "An error occurred while deleting the bibliotecario.";
-                _logger.LogError(ex, result.Message);
+                result.Message = biblioResult.Message;
+                return result;
             }
+
+            result.Success = true;
+            result.Message = biblioResult.Message;
+            _logger.LogInformation(result.Message);
+            _cacheService.ClearKeys();
             return result;
         }
 
@@ -152,137 +76,66 @@ namespace SIGEBI.Application.Services
                 result.Message = "Bibliotecarios retrieved from cache.";
                 return result;
             }
-            
-            try
-            {
-                _logger.LogInformation("Retrieving all bibliotecarios");
-                var bibliotecarios = await _bibliotecariosRepository.GetAll();
-                if (bibliotecarios is null)
-                {
-                    result.Success = false;
-                    result.Message = "No bibliotecarios found.";
-                    return result;
-                }
 
-                List<Bibliotecarios> bibliotecariosList = bibliotecarios.Data;
-
-                _cacheService.Set(cacheKey, bibliotecariosList);
-
-                result.Success = true;
-                result.Data = bibliotecariosList;
-                result.Message = "Bibliotecarios retrieved successfully.";
-                _logger.LogInformation(result.Message);
-                
-                return result;
-            }
-            catch (Exception ex)
+            _logger.LogInformation("Retrieving all Bibliotecarios.");
+            var biblioResult = await _bibliotecarioFacade.GetAllBibliotecariosAsync();
+            if (!biblioResult.Success)
             {
                 result.Success = false;
-                result.Message = "An error occurred while retrieving bibliotecarios.";
-                _logger.LogError(ex, result.Message);
-                return result;
+                result.Message = biblioResult.Message;
+                _logger.LogError($"Error retrieving all biblio: {result.Message}");
             }
+            _cacheService.Set(cacheKey, biblioResult.Data);
+
+            result.Success = true;
+            result.Data = biblioResult.Data;
+            result.Message = biblioResult.Message;
+            _logger.LogInformation(result.Message);
+                
             return result;
         }
 
         public async Task<ServiceResult> GetBibliotecarioByIdAsync(int id)
         {
             ServiceResult result = new ServiceResult();
-            try
-            {
-                _logger.LogInformation($"Retrieving bibliotecario with ID: {id}");
-                var existingBibliotecarioResult =  await _bibliotecariosRepository.GetBiblioById(id);
-                if (existingBibliotecarioResult is null || !existingBibliotecarioResult.Any())
-                {
-                    result.Success = false;
-                    result.Message = "Bibliotecario not found.";
-                    return result;
-                }
-                result.Success = true;
-                result.Data = existingBibliotecarioResult.FirstOrDefault();
-                result.Message = "Bibliotecario retrieved successfully.";
-                _logger.LogInformation(result.Message);
-                return result;
-            }
-            catch (Exception ex)
+
+            _logger.LogInformation($"Retrieving bibliotecario with ID: {id}");
+
+            var bilioResult = await _bibliotecarioFacade.GetBibliotecarioByIdAsync(id);
+            if(!bilioResult.Success)
             {
                 result.Success = false;
-                result.Message = "An error occurred while retrieving the bibliotecario.";
-                _logger.LogError(ex, result.Message);
+                result.Message = bilioResult.Message;
+                _logger.LogError($"Error retrieving a Bibliotecario: {result.Message}");
                 return result;
             }
+
+            result.Success = true;
+            result.Data = bilioResult.Data;
+            result.Message = bilioResult.Message;
+            _logger.LogInformation(result.Message);
+            return result;
+  
         }
 
         public async Task<ServiceResult> UpdateBibliotecarioAsync(BibliotecarioUpdateDto bibliotecarioUpdateDto)
         {
             ServiceResult result = new ServiceResult();
-            try
-            {
-                //Validaciones de negocio
-                _logger.LogInformation("Validating bibliotecario");
-                BibliotecarioDto bibliotecarioDto = new BibliotecarioDto()
-                {
-                    Nombre = bibliotecarioUpdateDto.Nombre,
-                    Apellido = bibliotecarioUpdateDto.Apellido,
-                    Edad = bibliotecarioUpdateDto.Edad,
-                    Genero = bibliotecarioUpdateDto.Genero,
-                    Email = bibliotecarioUpdateDto.Email,
-                    Cedula = bibliotecarioUpdateDto.Cedula,
-                    Nacimiento = bibliotecarioUpdateDto.Nacimiento,
-                    TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
-                    TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,
-                    TotalClientesAtendidos = bibliotecarioUpdateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioUpdateDto.TotalPrestamos ?? 0,
-                };
 
-                var updatevalidator = await _Validator.Validate(bibliotecarioDto,2);
-                if (!updatevalidator.IsValid)
-                {
-                    result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", updatevalidator.Errors);
-                    return result;
-                }
-
-                _logger.LogInformation($"Updating bibliotecario with ID: {bibliotecarioUpdateDto.Id}");
-                Bibliotecarios oBibliotecarioResult = new Bibliotecarios()
-                {
-                    Id = bibliotecarioUpdateDto.Id,
-                    Nombre = bibliotecarioUpdateDto.Nombre,
-                    Apellido = bibliotecarioUpdateDto.Apellido,
-                    Edad = bibliotecarioUpdateDto.Edad,
-                    Genero = bibliotecarioUpdateDto.Genero,
-                    Cedula = bibliotecarioUpdateDto.Cedula,
-                    Email = bibliotecarioUpdateDto.Email,
-                    Nacimiento = bibliotecarioUpdateDto.Nacimiento,
-                    TotalDevoluciones = bibliotecarioUpdateDto.TotalDevoluciones ?? 0,
-                    TotalHorasTrabajadas = bibliotecarioUpdateDto.TotalHorasTrabajadas ?? 0,
-                    TotalClientesAtendidos = bibliotecarioUpdateDto.TotalClientesAtendidos ?? 0,
-                    TotalPrestamos = bibliotecarioUpdateDto.TotalPrestamos ?? 0,
-                    BiblioEstatus = bibliotecarioUpdateDto.BiblioEstatus ?? Domain.Enums.Status.Activo,
-                };
-
-                var updateResult = await _bibliotecariosRepository.Update(oBibliotecarioResult);
-
-                if (!updateResult.Success)
-                {
-                    result.Success = false;
-                    result.Message = "Failed to update the bibliotecario.";
-                    return result;
-                }
-                result.Success = true;
-                result.Data = updateResult.Data;
-                result.Message = "Bibliotecario updated successfully.";
-                _logger.LogInformation(result.Message);
-                _cacheService.ClearKeys();
-                return result;
-            }
-            catch (Exception ex)
+            var biblioResult = await _bibliotecarioFacade.UpdateBibliotecarioAsync(bibliotecarioUpdateDto);
+                
+            if (!biblioResult.Success)
             {
                 result.Success = false;
-                result.Message = "An error occurred while updating the bibliotecario.";
-                _logger.LogError(ex, result.Message);
+                result.Message = biblioResult.Message;
                 return result;
             }
+            result.Success = true;
+            result.Data = biblioResult.Data;
+            result.Message = biblioResult.Message;
+            _logger.LogInformation(result.Message);
+            _cacheService.ClearKeys();
+            return result;
         }
     }
 }

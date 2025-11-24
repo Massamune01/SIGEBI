@@ -28,13 +28,10 @@ namespace SIGEBI.Test.Application
                 .Options;
 
             var loggerMock = new Mock<ILogger<PrestamosServices>>();
-            var IprestamosRepository = new Mock<IPrestamosRepository>();
-            var validator = new Mock<IValidatorBase<PrestamoDto>>();
+            var facade = new Mock<IPrestamoFacade>();
             var cacheservice = new Mock<ICacheService>();
-            var mapper = new Mock<IMapper>();
-            _mapper = mapper.Object;
             _context = new SIGEBIContext(options);
-            _prestamosServices = new PrestamosServices(IprestamosRepository.Object, loggerMock.Object, validator.Object, cacheservice.Object, _mapper);
+            _prestamosServices = new PrestamosServices( facade.Object,loggerMock.Object,cacheservice.Object);
         }
 
         [Fact]

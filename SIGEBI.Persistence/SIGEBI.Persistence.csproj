@@ -24,8 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Configuration\Credenciales\" />
-    <Folder Include="Models\Configuration\Rol\" />
+    <Folder Include="Models\Configuration\" />
   </ItemGroup>
 
 </Project>

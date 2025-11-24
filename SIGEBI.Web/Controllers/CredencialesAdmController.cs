@@ -18,7 +18,7 @@ namespace SIGEBI.Web.Controllers
         // GET: CredencialesAdmController
         public async Task<ActionResult> Index()
         {
-            ServiceResult result = await _credencialesService.GetCredencialesAll();
+            ServiceResult result = await _credencialesService.GetCredencialesAllAsync();
 
             if (!result.Success)
             {
@@ -32,7 +32,7 @@ namespace SIGEBI.Web.Controllers
         // GET: CredencialesAdmController/Details/5
         public async Task<ActionResult> Details(int id)
         {
-            ServiceResult result = await _credencialesService.GetCredencialesById(id);
+            ServiceResult result = await _credencialesService.GetCredencialesByIdAsync(id);
 
             CredencialesGetModel credencial = result.Data;
 
@@ -58,7 +58,7 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                ServiceResult result = await _credencialesService.CreateCredenciales(credencialesCreateDto);
+                ServiceResult result = await _credencialesService.CreateCredencialesAsync(credencialesCreateDto);
 
                 if (!result.Success)
                 {
@@ -77,7 +77,7 @@ namespace SIGEBI.Web.Controllers
         // GET: CredencialesAdmController/Edit/5
         public async Task<ActionResult> Edit(int id)
         {
-            ServiceResult result = await _credencialesService.GetCredencialesById(id);
+            ServiceResult result = await _credencialesService.GetCredencialesByIdAsync(id);
 
             CredencialesGetModel credencial = result.Data;
 
@@ -97,7 +97,7 @@ namespace SIGEBI.Web.Controllers
         {
             try
             {
-                ServiceResult result = await _credencialesService.UpdateCredenciales(credencialesUpdateDto);
+                ServiceResult result = await _credencialesService.UpdateCredencialesAsync(credencialesUpdateDto);
 
                 if (!result.Success)
                 {

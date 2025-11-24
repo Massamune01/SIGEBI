@@ -3,7 +3,7 @@ using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 
 namespace SIGEBI.Application.Interfaces
 {
-    public interface ILibroService
+    public interface ILibroFacade
     {
         Task<ServiceResult> GetAllLibrosAsync();
         Task<ServiceResult> GetLibroByIdAsync(Int64 id);

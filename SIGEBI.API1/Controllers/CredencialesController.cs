@@ -22,7 +22,7 @@ namespace SIGEBI.Api.Controllers
         [HttpGet("GetCredenciales")]
         public async Task<IActionResult> Get()
         {
-            ServiceResult result = await _credencialesService.GetCredencialesAll();
+            ServiceResult result = await _credencialesService.GetCredencialesAllAsync();
             if (!result.Success)
             {
                 return BadRequest(result);
@@ -34,7 +34,7 @@ namespace SIGEBI.Api.Controllers
         [HttpGet("GetEntityByID")]
         public async Task<IActionResult> Get(int id)
         {
-            ServiceResult result = await _credencialesService.GetCredencialesById(id);
+            ServiceResult result = await _credencialesService.GetCredencialesByIdAsync(id);
             if (!result.Success)
             {
                 return BadRequest(result);
@@ -46,7 +46,7 @@ namespace SIGEBI.Api.Controllers
         [HttpPost("create-credenciales")]
         public async Task<IActionResult> Post([FromBody] CredencialesCreateDto credencialesCreateDto)
         {
-            ServiceResult result = await _credencialesService.CreateCredenciales(credencialesCreateDto);
+            ServiceResult result = await _credencialesService.CreateCredencialesAsync(credencialesCreateDto);
             if (!result.Success)
             {
                 return BadRequest(result);
@@ -58,7 +58,7 @@ namespace SIGEBI.Api.Controllers
         [HttpPut("update-credenciales")]
         public async Task<IActionResult> Put([FromBody] CredencialesUpdateDto credencialesUpdateDto)
         {
-            ServiceResult result = await _credencialesService.UpdateCredenciales(credencialesUpdateDto);
+            ServiceResult result = await _credencialesService.UpdateCredencialesAsync(credencialesUpdateDto);
             if (!result.Success)
             {
                 return BadRequest(result);
@@ -70,7 +70,7 @@ namespace SIGEBI.Api.Controllers
         [HttpDelete("remove-credenciales")]
         public async Task<IActionResult> Delete(CredencialesRemoveDto credencialesRemoveDto)
         {
-            ServiceResult result = await _credencialesService.RemoveCredenciales(credencialesRemoveDto);
+            ServiceResult result = await _credencialesService.RemoveCredencialesAsync(credencialesRemoveDto);
             if (!result.Success)
             {
                 return BadRequest(result);

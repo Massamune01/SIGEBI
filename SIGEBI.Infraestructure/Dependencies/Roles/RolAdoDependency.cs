@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
+using SIGEBI.Application.Facades_Classes.Configuration;
 using SIGEBI.Application.Interfaces;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Services;
@@ -18,6 +14,7 @@ namespace SIGEBI.Infraestructure.Dependencies.Roles
     {
         public static void AddRolAdoDependency(this IServiceCollection Services)
         {
+            Services.AddScoped<IRolesFacade, RolesFacade>();
             Services.AddScoped<IRolRepository, RolRepositoryAdo>();
             Services.AddScoped<IValidatorBase<RolDto>, RolValidator>();
             Services.AddTransient<IRolService, RolService>();
