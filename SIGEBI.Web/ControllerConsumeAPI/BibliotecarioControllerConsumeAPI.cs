@@ -1,23 +1,25 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Biblio;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class BibliotecarioControllerConsumeAPI : Controller
     {
+        private readonly BibliotecarioHttpClient _biblioClient = new BibliotecarioHttpClient();
+
+
         // GET: BibliotecarioControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllBiblioResponse getAllBiblioResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_biblioClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Bibliotecarios/GetAllBiblio");
+                    var response = await _biblioClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -55,11 +57,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetBiblioResponse getBiblioResponse = null;
             try
             {
-                using(var client = new HttpClient()) 
+                using (_biblioClient.client)
                 {
-
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Bibliotecarios/GetBiblioById?id={id}");
+                    var response = await _biblioClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -105,11 +105,10 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             BibliotecarioCreateDto createResponse = null;
             try
             {
-                using(var client = new HttpClient())
+                using (_biblioClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response =  await client.PostAsJsonAsync("Bibliotecarios/create-biblio", model);
-                    if(response.IsSuccessStatusCode)
+                    var response = await _biblioClient.Create(model);
+                    if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
@@ -145,11 +144,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetBiblioResponse getBiblioResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_biblioClient.client)
                 {
-
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Bibliotecarios/GetBiblioById?id={id}");
+                    var response = await _biblioClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -191,10 +188,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             BibliotecarioUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_biblioClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Bibliotecarios/update-Biblio", model);
+                    var response = await _biblioClient.Edit(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -217,27 +213,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: BibliotecarioControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: BibliotecarioControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

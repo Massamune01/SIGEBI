@@ -2,22 +2,24 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Prestamo;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class PrestamoControllerConsumeAPI : Controller
     {
+        private readonly PrestamoHttpClient _prestClient = new PrestamoHttpClient();
+
         // GET: PrestamoControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllPrestamoResponse getAllPrestamoResponse = null;
             try
             {
-                using (var client =  new HttpClient())
+                using (_prestClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response =  await client.GetAsync("Prestamos/GetAllPrest");
+                    var response = await _prestClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -54,10 +56,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetPrestamoResponse getPrestamoResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_prestClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Prestamos/GetPrestById?id={id}");
+                    var response = await _prestClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -102,10 +103,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             PrestamoCreateDto createResponse = null;
             try
             {
-                using (var client= new HttpClient())
+                using (_prestClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response =  await client.PostAsJsonAsync("Prestamos/create-prestamos", model);
+                    var response = await _prestClient.Create(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -142,10 +142,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetPrestamoResponse getPrestamoResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_prestClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Prestamos/GetPrestById?id={id}");
+                    var response = await _prestClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -184,10 +183,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             PrestamoUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_prestClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Prestamos/update-prestamo", model);
+                    var response = await _prestClient.Edit(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -210,27 +208,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.ErrorMessage = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: PrestamoControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: PrestamoControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

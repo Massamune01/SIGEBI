@@ -1,22 +1,25 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.AdminDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Admin;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class AdminControllerConsumerAPI : Controller
     {
+        private readonly AdminHttpClient _adminClient = new AdminHttpClient();
+
         // GET: AdminControllerConsumerAPI
         public async Task<IActionResult> Index()
         {
+
             GetAllAdminsResponse getAllAdminsResponse = null;
             try
             {
-                using(var client = new HttpClient())
+                using(_adminClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Admins/GetAllAdmin");
+                    var response = await _adminClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -54,11 +57,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetAdminsResponse getAdminsResponse = null;
             try
             {
-                using(var cliente = new HttpClient()) 
-                {                     
-                    
-                    cliente.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await cliente.GetAsync($"Admins/GetAdminById?id={id}");
+                using (_adminClient.client)
+                {
+                    var response = await _adminClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -105,11 +106,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             AdminCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_adminClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-
-                    var response = await client.PostAsJsonAsync("Admins/create-admin", model);
+                    var response = await _adminClient.Create(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -149,18 +148,16 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetAdminsResponse getAdminsResponse = null;
             try
             {
-                using (var cliente = new HttpClient())
+                using (_adminClient.client)
                 {
-
-                    cliente.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await cliente.GetAsync($"Admins/GetAdminById?id={id}");
+                    var response = await _adminClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
                         };
-                        var responseString = response.Content.ReadAsStringAsync().Result;
+                        var responseString = await response.Content.ReadAsStringAsync();
                         getAdminsResponse = JsonSerializer.Deserialize<GetAdminsResponse>(responseString, options);
                     }
                     else
@@ -192,11 +189,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             AdminUpdateDto editResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_adminClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-
-                    var response = await client.PutAsJsonAsync<AdminUpdateDto>("Admins/UpdateAdmin", model);
+                    var response = await _adminClient.Edit(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -218,27 +213,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                     }
                 }
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: AdminControllerConsumerAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: AdminControllerConsumerAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

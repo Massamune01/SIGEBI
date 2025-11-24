@@ -1,22 +1,24 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.RolDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Roles;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class RolControllerConsumeAPI : Controller
     {
+        private readonly RolHttpClient _rolClient = new RolHttpClient();
+
         // GET: RolControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllRolesResponse getAllRolesResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_rolClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Rol/GetRoles");
+                    var response = await _rolClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -54,10 +56,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetRolesResponse getRolesResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_rolClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Rol/GetEntityByID?id={id}");
+                    var response = await _rolClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -103,11 +104,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             RolCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_rolClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-
-                    var response = await client.PostAsJsonAsync("Rol/create-rol", model);
+                    var response = await _rolClient.Create(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -147,10 +146,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetRolesResponse getRolesResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_rolClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Rol/GetEntityByID?id={id}");
+                    var response = await _rolClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -190,11 +188,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             RolUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_rolClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-
-                    var response = await client.PutAsJsonAsync("Rol/update-rol", model);
+                    var response = await _rolClient.Edit(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -220,27 +216,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                     }
                 }
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: RolControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: RolControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

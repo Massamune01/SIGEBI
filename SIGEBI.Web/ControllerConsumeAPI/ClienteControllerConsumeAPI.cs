@@ -1,24 +1,24 @@
 ﻿using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.ClienteDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Cliente;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class ClienteControllerConsumeAPI : Controller
     {
+        ClienteHttpClient _clienteClient = new ClienteHttpClient();
+
         // GET: ClienteControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllClienteResponse getAllClienteResponse = null;
             try
             {
-                using(var client = new HttpClient())
+                using(_clienteClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Clientes/GetAllClientes");
+                    var response = await _clienteClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -56,10 +56,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetClienteResponse getClienteResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_clienteClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Clientes/GetClienteById?id={id}");
+                    var response = await _clienteClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -105,11 +104,10 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             ClienteCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_clienteClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response  = await client.PostAsJsonAsync("Clientes/create-cliente", model);
-                    if(response.IsSuccessStatusCode)
+                    var response = await _clienteClient.Create(model);
+                    if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
                         {
@@ -145,10 +143,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetClienteResponse getClienteResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_clienteClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Clientes/GetClienteById?id={id}");
+                    var response = await _clienteClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -188,10 +185,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             ClienteUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_clienteClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Clientes/update-cliente", model);
+                    var response = await _clienteClient.Edit(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -214,27 +210,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: ClienteControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: ClienteControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

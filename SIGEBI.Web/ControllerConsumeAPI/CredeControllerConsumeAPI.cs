@@ -1,22 +1,24 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.CredencialesDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Crede;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class CredeControllerConsumeAPI : Controller
     {
+        private readonly CredeHttpClient _credeClient = new CredeHttpClient();
+
         // GET: CredeControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllCredeResponse getAllCredeResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_credeClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Credenciales/GetCredenciales");
+                    var response = await _credeClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -54,10 +56,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetCredeResponse getCredeResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_credeClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await _credeClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -103,10 +104,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             CredencialesCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_credeClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PostAsJsonAsync("Credenciales/create-credenciales", model);
+                    var response = await _credeClient.Create(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -143,10 +143,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetCredeResponse getCredeResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_credeClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Credenciales/GetEntityByID?id={id}");
+                    var response = await _credeClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -186,10 +185,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             CredencialesUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_credeClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Credenciales/update-credenciales", model);
+                    var response = await _credeClient.Edit(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -212,27 +210,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: CredeControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: CredeControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

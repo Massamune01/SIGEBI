@@ -1,22 +1,24 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.LogOperationsDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.LogOp;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class LogOpControllerConsumeAPI : Controller
     {
+        private readonly LogOpHttpClient _logOpClient = new LogOpHttpClient();
+
         // GET: LogOpControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllLogOpResponse getAllLogOpResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_logOpClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("LogOperations/GetAllLogOp");
+                    var response = await _logOpClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -55,10 +57,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetLogOpResponse getLogOpResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_logOpClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"LogOperations/GetLogOpById?id={id}");
+                    var response = await _logOpClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -105,10 +106,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             CreateLogOperationDto createResponse = null;
             try
             {
-                using(var client = new HttpClient())
+                using (_logOpClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response =  await client.PostAsJsonAsync("LogOperations/create-LogOp", model);
+                    var response = await _logOpClient.Create(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -147,10 +147,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetLogOpResponse getLogOpResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_logOpClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"LogOperations/GetLogOpById?id={id}");
+                    var response = await _logOpClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -191,10 +190,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             UpdateLogOperationDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_logOpClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("LogOperations/update-LogOp", model);
+                    var response = await _logOpClient.Edit(model);
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -219,27 +217,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.Error = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: LogOpControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: LogOpControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch

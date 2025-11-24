@@ -1,23 +1,24 @@
 ﻿using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
+using SIGEBI.Infraestructure.ClassHttpClient;
 using SIGEBI.Web.ViewModels.Libro;
 
 namespace SIGEBI.Web.ControllerConsumeAPI
 {
     public class LibroControllerConsumeAPI : Controller
     {
+        private readonly LibroHttpClient _libroClient = new LibroHttpClient();
+
         // GET: LibroControllerConsumeAPI
         public async Task<IActionResult> Index()
         {
             GetAllLibroResponse getAllLibroResponse = null;
             try
             {
-                using(var client = new HttpClient())
+                using(_libroClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync("Libroes/GetAllLibros");
+                    var response = await _libroClient.Index();
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -54,10 +55,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetLibroResponse getLibroResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_libroClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Libroes/GetLibroById?id={id}");
+                    var response = await _libroClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -102,10 +102,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             LibroCreateDto createResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_libroClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PostAsJsonAsync("Libroes/create-libro", model);
+                    var response = await _libroClient.Create(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -142,10 +141,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             GetLibroResponse getLibroResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_libroClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.GetAsync($"Libroes/GetLibroById?id={id}");
+                    var response = await _libroClient.Details(id);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -184,10 +182,9 @@ namespace SIGEBI.Web.ControllerConsumeAPI
             LibroUpdateDto updateResponse = null;
             try
             {
-                using (var client = new HttpClient())
+                using (_libroClient.client)
                 {
-                    client.BaseAddress = new Uri("https://localhost:7135/api/");
-                    var response = await client.PutAsJsonAsync("Libroes/update-libro", model);
+                    var response = await _libroClient.Edit(model);
                     if (response.IsSuccessStatusCode)
                     {
                         var options = new JsonSerializerOptions
@@ -210,27 +207,6 @@ namespace SIGEBI.Web.ControllerConsumeAPI
                         ViewBag.ErrorMessage = "Error al consumir la API";
                     }
                 }
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-
-        // GET: LibroControllerConsumeAPI/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: LibroControllerConsumeAPI/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
                 return RedirectToAction(nameof(Index));
             }
             catch
