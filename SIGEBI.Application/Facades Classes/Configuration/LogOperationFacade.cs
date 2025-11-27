@@ -13,10 +13,10 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
     {
         private readonly ILogOperationsRepository _logOperationsRepository;
         private readonly IValidatorBase<LogOperationsDto> _Validator;
-        private readonly ILogger<LogOperationsDto> _logger;
+        private readonly ILogger<LogOperationFacade> _logger;
 
         public LogOperationFacade(ILogOperationsRepository logOperationsRepository, 
-            IValidatorBase<LogOperationsDto> validator, ILogger<LogOperationsDto> logger)
+            IValidatorBase<LogOperationsDto> validator, ILogger<LogOperationFacade> logger)
         {
             _logOperationsRepository = logOperationsRepository;
             _Validator = validator;
@@ -44,7 +44,7 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
                 if (!createValidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", createValidator.Errors);
+                    result.Message = createValidator.Errors.FirstOrDefault();
                     return result;
                 }
 

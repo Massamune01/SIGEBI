@@ -33,6 +33,7 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (string.IsNullOrWhiteSpace(entity.Nombre))
                     {
                         validationResult.AddError("Nombre is required.");
+                        return validationResult;
                     }
 
 
@@ -40,24 +41,28 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (string.IsNullOrWhiteSpace(entity.Apellido))
                     {
                         validationResult.AddError("Apellido is required.");
+                        return validationResult;
                     }
 
                     //Edad should be greater than 17
                     if (entity.Edad < 17)
                     {
                         validationResult.AddError("Edad must be at least 17.");
+                        return validationResult;
                     }
 
                     // Nacimiento should not be in the future
                     if (entity.Nacimiento.HasValue && entity.Nacimiento > DateOnly.FromDateTime(DateTime.Now))
                     {
                         validationResult.AddError("Nacimiento cannot be in the future.");
+                        return validationResult;
                     }
 
                     // Nacimiento cannot be same as today
                     if (entity.Nacimiento.HasValue && entity.Nacimiento == DateOnly.FromDateTime(DateTime.Now))
                     {
                         validationResult.AddError("Nacimiento cannot be today's date.");
+                        return validationResult;
                     }
 
 
@@ -65,6 +70,7 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (string.IsNullOrWhiteSpace(entity.Cedula))
                     {
                         validationResult.AddError("Cedula is required.");
+                        return validationResult;
                     }
 
                     //Check if Cedula is already in use
@@ -72,12 +78,14 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (existingCedula.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Cedula is already in use.");
+                        return validationResult;
                     }
 
                     // Check if Email is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Email))
                     {
                         validationResult.AddError("Email is required.");
+                        return validationResult;
                     }
 
                     // Check if email is already in use
@@ -85,6 +93,7 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (existingEmail.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Email is already in use.");
+                        return validationResult;
                     }
 
                     return validationResult;
@@ -96,12 +105,14 @@ namespace SIGEBI.Application.Validators.Configuration.ClienteValidators
                     if (entity.Nacimiento.HasValue && entity.Nacimiento > DateOnly.FromDateTime(DateTime.Now))
                     {
                         validationResult.AddError("Nacimiento cannot be in the future.");
+                        return validationResult;
                     }
 
                     // Nacimiento cannot be same as today
                     if (entity.Nacimiento.HasValue && entity.Nacimiento == DateOnly.FromDateTime(DateTime.Now))
                     {
                         validationResult.AddError("Nacimiento cannot be today's date.");
+                        return validationResult;
                     }
 
                     return validationResult;

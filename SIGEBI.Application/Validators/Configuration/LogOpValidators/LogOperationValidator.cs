@@ -32,24 +32,28 @@ namespace SIGEBI.Application.Validators.Configuration.LogOpValidators
                     if (string.IsNullOrWhiteSpace(entity.Entity))
                     {
                         validationResult.AddError("Entity is required.");
+                        return validationResult;
                     }
 
                     // Check if Description is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Descripcion))
                     {
                         validationResult.AddError("Description is required.");
+                        return validationResult;
                     }
 
                     // Check if TypeOperation is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.TypeOperation))
                     {
                         validationResult.AddError("TypeOperation is required.");
+                        return validationResult;
                     }
 
                     // Check if Fecha is not in the future
                     if (entity.Fecha > DateTime.Now)
                     {
                         validationResult.AddError("Fecha cannot be in the future.");
+                        return validationResult;
                     }
 
                     return validationResult;
@@ -60,11 +64,13 @@ namespace SIGEBI.Application.Validators.Configuration.LogOpValidators
                     if (entity.IdOp <= 0)
                     {
                         validationResult.AddError("Invalid LogOperation ID for update.");
+                        return validationResult;
                     }
 
                     if (string.IsNullOrWhiteSpace(entity.Entity))
                     {
                         validationResult.AddError("Entity is required.");
+                        return validationResult;
                     }
 
                     return validationResult;

@@ -7,7 +7,6 @@ using SIGEBI.Domain.Entities.Configuration;
 using SIGEBI.Domain.Enums;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Repositories.Configuration;
-using SIGEBI.Persistence.Security.Configuration.ValidarAdmin;
 
 namespace SIGEBI.Test.Persistence
 {

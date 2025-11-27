@@ -49,7 +49,7 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
                 if (!createvalidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", createvalidator.Errors);
+                    result.Message =createvalidator.Errors.FirstOrDefault();
                     return result;
                 }
 
@@ -219,7 +219,7 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
                 if (!updatevalidator.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", updatevalidator.Errors);
+                    result.Message = updatevalidator.Errors.FirstOrDefault();
                     return result;
                 }
 

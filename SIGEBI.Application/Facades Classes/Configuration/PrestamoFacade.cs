@@ -46,10 +46,10 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
 
                 var prestamoValidation = await _Validator.Validate(prestamoDto, 1);
 
-                if (!prestamoValidation.IsValid)
+                if (prestamoValidation.Errors.Count >= 0)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", prestamoValidation.Errors);
+                    result.Message = prestamoValidation.Errors.FirstOrDefault();
                     return result;
                 }
 

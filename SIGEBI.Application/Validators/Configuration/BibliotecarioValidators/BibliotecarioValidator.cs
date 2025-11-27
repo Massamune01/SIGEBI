@@ -3,8 +3,6 @@ using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.BibliotecariosDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
-using SIGEBI.Domain.Entities.Configuration;
-using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
 {
@@ -34,12 +32,14 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                     if (existingCedula.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Cedula is already in use.");
+                        return validationResult;
                     }
 
                     // Check if Email is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.Email))
                     {
                         validationResult.AddError("Email is required.");
+                        return validationResult;
                     }
 
                     // Check if email is already in use
@@ -47,6 +47,7 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                     if (existingEmail.FirstOrDefault() != null)
                     {
                         validationResult.AddError("Email is already in use.");
+                        return validationResult;
                     }
 
                     
@@ -60,33 +61,39 @@ namespace SIGEBI.Application.Validators.Configuration.BibliotecarioValidators
                     if (string.IsNullOrWhiteSpace(entity.Email))
                     {
                         validationResult.AddError("Email is required.");
+                        return validationResult;
                     }
 
                     // TotalDevoluciones cannot be negative
                     if(entity.TotalDevoluciones < 0)
                     {
                         validationResult.AddError("TotalDevoluciones cannot be negative.");
+                        return validationResult;
                     }
 
                     // TotalPrestamos cannot be negative
                     if (entity.TotalPrestamos < 0)
                     {
                         validationResult.AddError("TotalPrestamos cannot be negative.");
+                        return validationResult;
                     }
 
                     if(entity.TotalPrestamos < entity.TotalDevoluciones)
                     {
                         validationResult.AddError("TotalDevoluciones cannot be greater than TotalPrestamos.");
+                        return validationResult;
                     }
 
                     if(entity.TotalClientesAtendidos < 0) 
                     {
                         validationResult.AddError("TotalClientesAtendidos cannot be negative.");
+                        return validationResult;
                     }
 
                     if(entity.TotalHorasTrabajadas < 0) 
                     {
                         validationResult.AddError("TotalHorasTrabajadas cannot be negative.");
+                        return validationResult;
                     }
 
                     return validationResult;

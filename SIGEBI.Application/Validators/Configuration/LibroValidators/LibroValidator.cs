@@ -3,7 +3,6 @@ using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.LibroDtos;
 using SIGEBI.Application.Repositories.Configuration;
 using SIGEBI.Application.Validators.Base;
-using SIGEBI.Domain.Enums;
 
 namespace SIGEBI.Application.Validators.Configuration.LibroValidators
 {
@@ -29,38 +28,36 @@ namespace SIGEBI.Application.Validators.Configuration.LibroValidators
 
                     // Basic validation: Check for required fields
                     // Check if ISBN is not null or empty
-                    if (entity.ISBN == null)
+                    if (entity.ISBN == null || entity.ISBN <= 0)
                     {
                         validationResult.AddError("ISBN is required.");
+                        return validationResult;
                     }
                     // Check if titulo is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.titulo))
                     {
                         validationResult.AddError("Titulo is required.");
+                        return validationResult;
                     }
                     // Check if autor is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.autor))
                     {
                         validationResult.AddError("Autor is required.");
+                        return validationResult;
                     }
                     // Check for unique ISBN
                     var existingLibros = await _libroRepository.GetLibroById(entity.ISBN);
                     if (existingLibros != null)
                     {
                         validationResult.AddError("A libro with the same ISBN already exists.");
+                        return validationResult;
                     }
 
                     // Check if cantidad is non-negative
                     if (entity.cantidad <= 0)
                     {
                         validationResult.AddError("Cantidad cannot be negative.");
-                    }
-
-                    // Check Status enum validity
-                    var statusValues = Enum.GetValues(typeof(Status)).Cast<Status>();
-                    if (!statusValues.Contains(entity.Status))
-                    {
-                        validationResult.AddError("Invalid status value.");
+                        return validationResult;
                     }
 
                     return validationResult;
@@ -71,16 +68,19 @@ namespace SIGEBI.Application.Validators.Configuration.LibroValidators
                     if (string.IsNullOrWhiteSpace(entity.titulo))
                     {
                         validationResult.AddError("Titulo is required.");
+                        return validationResult;
                     }
                     // Check if autor is not null or empty
                     if (string.IsNullOrWhiteSpace(entity.autor))
                     {
                         validationResult.AddError("Autor is required.");
+                        return validationResult;
                     }
                     // Check if cantidad is non-negative
                     if (entity.numPaginas <= 0)
                     {
                         validationResult.AddError("Cantidad cannot be negative.");
+                        return validationResult;
                     }
                     return validationResult;
                 }

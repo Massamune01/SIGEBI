@@ -2,14 +2,11 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SIGEBI.Application.Base;
 using SIGEBI.Application.Dtos.Configuration.PrestamosDtos;
+using SIGEBI.Application.Facades_Classes.Configuration;
 using SIGEBI.Application.Interfaces;
-using SIGEBI.Application.Repositories.Configuration;
-using SIGEBI.Application.Services;
-using SIGEBI.Application.Validators.Base;
 using SIGEBI.Application.Validators.Configuration.PrestamosValidators;
-using SIGEBI.Domain.Base;
-using SIGEBI.Domain.Interfaces.Cache;
 using SIGEBI.Persistence.Context;
 using SIGEBI.Persistence.Repositories.Configuration;
 
@@ -17,9 +14,8 @@ namespace SIGEBI.Test.Application
 {
     public class PrestamoServicesTest
     {
-        private readonly IPrestamosService _prestamosServices;
+        private readonly IPrestamoFacade _prestamoFacade;
         private readonly SIGEBIContext _context;
-        private readonly IMapper _mapper;
 
         public PrestamoServicesTest()
         {
@@ -27,11 +23,15 @@ namespace SIGEBI.Test.Application
                 .UseInMemoryDatabase("SIGEBI")
                 .Options;
 
-            var loggerMock = new Mock<ILogger<PrestamosServices>>();
-            var facade = new Mock<IPrestamoFacade>();
-            var cacheservice = new Mock<ICacheService>();
+
             _context = new SIGEBIContext(options);
-            _prestamosServices = new PrestamosServices( facade.Object,loggerMock.Object,cacheservice.Object);
+            var loggerMock = new Mock<ILogger<PrestamoFacade>>();
+            var loggerMock1 = new Mock<ILogger<PrestamoValidator>>();
+            var loggerMock2 = new Mock<ILogger<PrestamosRepository>>();
+            var repository = new PrestamosRepository(_context,loggerMock2.Object);
+            var validator = new PrestamoValidator(repository, loggerMock1.Object);
+            var mapper = new Mock<IMapper>();
+            _prestamoFacade = new PrestamoFacade(repository, validator, loggerMock.Object, mapper.Object);
         }
 
         [Fact]
@@ -39,14 +39,14 @@ namespace SIGEBI.Test.Application
         {
             // Arrange
             PrestamoCreateDto dtoPrestamo = new PrestamoCreateDto() 
-            { IdLibros = 1234556431243};
+            { IdLibros = 1234556431243, DatePrest = DateTime.Now};
 
             // Act
-            var libro = await _prestamosServices.CreatePrestamoAsync(dtoPrestamo);
+            var libro = await _prestamoFacade.CreatePrestamoAsync(dtoPrestamo);
             string message = "Libro not found.";
 
             // Assert
-            Assert.IsType<OperationResult>(libro);
+            Assert.IsType<ServiceResult>(libro);
             Assert.Equal(message, libro.Message);
             Assert.False(libro.Success);
         }

@@ -51,7 +51,7 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
                 if (!createValidation.IsValid)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", createValidation.Errors);
+                    result.Message = createValidation.Errors.FirstOrDefault();
                     return result;
                 }
 

@@ -46,10 +46,10 @@ namespace SIGEBI.Application.Facades_Classes.Configuration
                 _logger.LogInformation("validating a admin");
                 var adminvalidation = await _adminValidator.Validate(adminDto, 1);
 
-                if (!adminvalidation.IsValid)
+                if (adminvalidation.Errors.Count > 0)
                 {
                     result.Success = false;
-                    result.Message = "Validation errors: " + string.Join(", ", adminvalidation.Errors);
+                    result.Message = adminvalidation.Errors.FirstOrDefault();
                     return result;
                 }
 
